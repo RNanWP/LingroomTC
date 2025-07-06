@@ -1,0 +1,49 @@
+
+
+
+
+
+Tecnologias e Ferramentas
+
+Linguagem: TypeScript
+
+Runtime e Framework: Node.js + Express
+
+Banco de Dados: MongoDB (NoSQL)
+
+ORM/ODM: Mongoose
+
+Containerização: Docker (Dockerfile + Docker Compose)
+
+CI/CD: GitHub Actions
+
+Testes: Jest + Supertest (cobertura mínima de 20%)
+
+Documentação: Swagger (OpenAPI) + README.md
+
+
+_______________________________________________________________________________________________________________
+
+Estrutura de Pastas
+
+/backend
+├─ src
+│  ├─ config         # Variáveis de ambiente e inicialização
+│  ├─ controllers    # Funções que recebem e respondem às requisições
+│  ├─ services       # Lógica de negócio
+│  ├─ models         # Esquemas Mongoose
+│  ├─ routes         # Definição de rotas Express
+│  ├─ middlewares    # Autenticação, erros, logs
+│  ├─ utils          # Helpers e funções utilitárias
+│  ├─ tests          # Testes unitários e de integração
+│  ├─ index.ts       # Ponto de entrada da aplicação
+├─ Dockerfile
+├─ docker-compose.yml
+├─ jest.config.js
+├─ .env.example
+├─ .github
+│   └─ workflows
+│       └─ ci-cd.yml
+├─ tsconfig.json
+├─ package.json
+└─ README.md
