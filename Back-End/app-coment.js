@@ -1,12 +1,11 @@
+"use strict";
 // Connect to Cluster0 Tech Challenge
 //
 // reenan92011
 // uTUCcf8O3A2bB8P1
-
 //          COISAS A SE FAZER NO PROJETO:
 //
 // Pegar o JWT Token e implementar-lo no código
-
 //          DICAS E APRENDIZADOS
 //
 // .ENV usado para adicionar a rota do MongoDB.
@@ -34,7 +33,6 @@
 // É um operador lógico de negação lógica, função de inverter um valor booleano.
 // usamos para checar se uma variável não é null ou undefined
 // garantir que um valor obrigatório não é vazio
-
 //          INSTALAÇÃOES
 // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 // npm install express

@@ -1,6 +1,33 @@
 import { Request, Response } from "express";
 import * as postService from "../services/postServices";
 
+// barra de pesquisa
+export async function searchPosts(req: Request, res: Response) {
+  const query = req.query.q;
+
+  if (!query || typeof query !== "string") {
+    return res
+      .status(400)
+      .json({ message: "Parâmetro de busca é obrigatório" });
+  }
+  try {
+    const post = await postService.searchPostService(query);
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao buscar posts" });
+  }
+}
+
+// Visão ADM
+export async function getAdminPosts(req: Request, res: Response) {
+  try {
+    const posts = await postService.getAdminPostService();
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao buscar posts para admin" });
+  }
+}
+
 export async function getAllPosts(req: Request, res: Response) {
   try {
     const posts = await postService.getAllPostsService();

@@ -1,5 +1,25 @@
 import { Post, IPost } from "../models/Post";
 
+// Buscar post por palavra chave no titulo ou conteudo
+export async function searchPostService(query: string): Promise<IPost[]> {
+  const searchRegex = new RegExp(query, "i");
+
+  return Post.find({
+    $or: [
+      { title: { $regex: searchRegex } },
+      { content: { $regex: searchRegex } },
+    ],
+  })
+    .sort({ createdAt: -1 })
+    .exec();
+}
+
+// Retorna todos os posts para gerenciamento (ADM)
+export async function getAdminPostService(): Promise<IPost[]> {
+  return Post.find().sort({ createdAt: -1 }).exec();
+}
+
+// ------
 export async function getAllPostsService(): Promise<IPost[]> {
   return Post.find().sort({ createdAt: -1 }).exec();
 }
