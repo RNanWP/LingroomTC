@@ -5,12 +5,14 @@ import postRoutes from "./routes/postRoutes";
 
 const app = express();
 
+app.use(express.json());
+
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error(err));
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 app.use("/api", postRoutes);
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 export { app };
