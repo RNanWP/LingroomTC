@@ -2,13 +2,36 @@ import { User, IUser } from "../models/User";
 import { JWT_SECRET } from "../config";
 import jwt from "jsonwebtoken";
 
-// Registrar usuario
+// Método usado para colcoar a role a criação do usuario para fazer testes com insominia
+interface JwtPayload {
+  id: string;
+  email: string;
+  role: string;
+}
+
+interface CreateUserPayload {
+  name: IUser["name"];
+  email: IUser["email"];
+  password: IUser["password"];
+  role?: IUser["role"];
+}
+
 export async function registerUserService(
-  userData: Omit<IUser, "comparePassword">
+  userData: CreateUserPayload
 ): Promise<IUser> {
   const user = new User(userData);
   return user.save();
 }
+
+// ---------------------------------------
+
+// Registrar usuario
+// export async function registerUserService(
+//   userData: Omit<IUser, "comparePassword">
+// ): Promise<IUser> {
+//   const user = new User(userData);
+//   return user.save();
+// }
 
 // Autenticando usuario
 export async function loginUserService(

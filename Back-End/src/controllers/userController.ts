@@ -4,7 +4,15 @@ import * as userService from "../services/userServices";
 // registro
 export async function register(req: Request, res: Response) {
   try {
-    const user = await userService.registerUserService(req.body);
+    const { name, email, password, role } = req.body;
+    const user = await userService.registerUserService({
+      name,
+      email,
+      password,
+      role,
+    });
+    // const user = await userService.registerUserService(req.body);
+
     // remove a senha por segurança
     const userResponse = user.toObject();
     delete userResponse.password;
