@@ -51,3 +51,4 @@
 // tsc --init / create tsconfig.json
 // npm i --save-dev @types/express` / para o tsconfig
 // npm install --save-dev jest
+// docker-compose up --build
