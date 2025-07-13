@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { MONGO_URI, PORT } from "./config";
 import express from "express";
+import { MONGO_URI, PORT } from "./config";
 import postRoutes from "./routes/postRoutes";
 import userRoutes from "./routes/userRoutes";
 
@@ -8,14 +8,21 @@ const app = express();
 
 app.use(express.json());
 
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error(err));
-
 app.use("/api/users", userRoutes);
 app.use("/api", postRoutes);
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+let server: import("http").Server;
 
-export { app };
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(MONGO_URI)
+    .then(() => {
+      console.log("MongoDB connected");
+      server = app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    })
+    .catch((err) => console.error("Failed to connect to MongoDB", err));
+}
+
+export { app, server };

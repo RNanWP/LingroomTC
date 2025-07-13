@@ -11,6 +11,7 @@ export async function register(req: Request, res: Response) {
       password,
       role,
     });
+    
     // const user = await userService.registerUserService(req.body);
 
     // remove a senha por segurança

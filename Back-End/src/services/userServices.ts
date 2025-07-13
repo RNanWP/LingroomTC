@@ -2,7 +2,7 @@ import { User, IUser } from "../models/User";
 import { JWT_SECRET } from "../config";
 import jwt from "jsonwebtoken";
 
-// Método usado para colcoar a role a criação do usuario para fazer testes com insominia
+// Método usado para colcoar na role a criação do usuario para fazer testes com insominia
 interface JwtPayload {
   id: string;
   email: string;
