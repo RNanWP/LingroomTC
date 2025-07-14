@@ -14,19 +14,19 @@ router.get("/posts/:id", asyncHandler(postController.getPostById));
 router.post(
   "/posts",
   authenticate,
-  authorize(["professor", "administrador"]),
+  authorize("professor", "administrador"),
   asyncHandler(postController.createPost)
 );
 router.put(
   "/posts/:id",
   authenticate,
-  authorize(["professor", "administrador"]),
+  authorize("professor", "administrador"),
   asyncHandler(postController.updatePost)
 );
 router.delete(
   "/posts/:id",
   authenticate,
-  authorize(["professor", "administrador"]),
+  authorize("professor", "administrador"),
   asyncHandler(postController.deletePost)
 );
 
@@ -34,7 +34,7 @@ router.delete(
 router.get(
   "/admin/posts",
   authenticate,
-  authorize(["administrador"]),
+  authorize("administrador"),
   asyncHandler(postController.getAdminPosts)
 );
 

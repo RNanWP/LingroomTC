@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import { RequestHandler, Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config";
 
@@ -33,10 +33,32 @@ export const authenticate: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const authorize = (roles: string[]): RequestHandler => {
+// export const authorize = (roles: string[]): RequestHandler => {
+//   return (req, res, next) => {
+//     if (!req.user) {
+//       res.status(401).json({ message: "Token inválido ou expirado." });
+//       return;
+//     }
+
+//     if (!roles.includes(req.user.role)) {
+//       res.status(403).json({
+//         message:
+//           "Acesso proibido. Você não tem permissão para executar esta ação.",
+//       });
+//       return;
+//     }
+//     next();
+//   };
+// };
+
+export const authorize = (...roles: string[]): RequestHandler => {
   return (req, res, next) => {
+    console.log("ROLE no token:", req.user?.role);
+    console.log("Roles permitidas:", roles);
     if (!req.user) {
-      res.status(401).json({ message: "Token inválido ou expirado." });
+      res
+        .status(401)
+        .json({ message: "Acesso negado. Faça login para continuar." });
       return;
     }
 

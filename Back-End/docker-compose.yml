@@ -1,10 +1,12 @@
 services:
-  api:
+  api-1:
     build: .
     container_name: lingroom_app
     ports:
       - "3000:3000"
-    env_file: .env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/TechChallengeEducaTC
+      - PORT=3000
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules

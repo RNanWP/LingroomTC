@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.66% </span>
+                <span class="strong">31.37% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/102</span>
+                <span class='fraction'>32/102</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">30.35% </span>
+                <span class="strong">42.85% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>17/56</span>
+                <span class='fraction'>24/56</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">6.66% </span>
+                <span class="strong">36.66% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/30</span>
+                <span class='fraction'>11/30</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">18.6% </span>
+                <span class="strong">34.88% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/86</span>
+                <span class='fraction'>30/86</span>
             </div>
         
             
@@ -247,12 +247,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -295,10 +295,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -320,15 +320,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -395,13 +395,13 @@ var __importStar = (this &amp;&amp; this.__importStar) || (function () {
 <span class="cstat-no" title="statement not covered" >        return result;</span>
     };
 })();
-var __awaiter = (this &amp;&amp; this.__awaiter) || <span class="fstat-no" title="function not covered" >fu</span>nction (thisArg, _arguments, P, generator) {
-    function <span class="fstat-no" title="function not covered" >adopt(</span>value) { <span class="cstat-no" title="statement not covered" >return value instanceof P ? value : new P(<span class="fstat-no" title="function not covered" >fu</span>nction (resolve) { <span class="cstat-no" title="statement not covered" >resolve(value); </span>}); </span>}
-<span class="cstat-no" title="statement not covered" >    return new (P || (P = Promise))(<span class="fstat-no" title="function not covered" >fu</span>nction (resolve, reject) {</span>
-        function <span class="fstat-no" title="function not covered" >fulfilled(</span>value) { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >step(generator.next(value)); </span>} catch (e) { <span class="cstat-no" title="statement not covered" >reject(e); </span>} </span>}
+var __awaiter = (this &amp;&amp; this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : <span class="branch-1 cbranch-no" title="branch not covered" >new P(<span class="fstat-no" title="function not covered" >fu</span>nction (resolve) { <span class="cstat-no" title="statement not covered" >resolve(value); </span>});</span> }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { <span class="cstat-no" title="statement not covered" >reject(e); </span>} }
         function <span class="fstat-no" title="function not covered" >rejected(</span>value) { <span class="cstat-no" title="statement not covered" >try { <span class="cstat-no" title="statement not covered" >step(generator["throw"](value)); </span>} catch (e) { <span class="cstat-no" title="statement not covered" >reject(e); </span>} </span>}
-        function <span class="fstat-no" title="function not covered" >step(</span>result) { <span class="cstat-no" title="statement not covered" >result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); </span>}
-<span class="cstat-no" title="statement not covered" >        step((generator = generator.apply(thisArg, _arguments || [])).next());</span>
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -443,11 +443,11 @@ function <span class="fstat-no" title="function not covered" >getAdminPosts(</sp
         }
     });
 }
-function <span class="fstat-no" title="function not covered" >getAllPosts(</span>req, res) {
-<span class="cstat-no" title="statement not covered" >    return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >fu</span>nction* () {</span>
-<span class="cstat-no" title="statement not covered" >        try {</span>
-            const posts = <span class="cstat-no" title="statement not covered" >yield postService.getAllPostsService();</span>
-<span class="cstat-no" title="statement not covered" >            res.json(posts);</span>
+function getAllPosts(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const posts = yield postService.getAllPostsService();
+            res.json(posts);
         }
         catch (err) {
 <span class="cstat-no" title="statement not covered" >            res.status(500).json({ message: "Erro ao buscar posts" });</span>
@@ -468,16 +468,16 @@ function <span class="fstat-no" title="function not covered" >getPostById(</span
         }
     });
 }
-function <span class="fstat-no" title="function not covered" >createPost(</span>req, res) {
-<span class="cstat-no" title="statement not covered" >    return __awaiter(this, void 0, void 0, <span class="fstat-no" title="function not covered" >fu</span>nction* () {</span>
-<span class="cstat-no" title="statement not covered" >        try {</span>
-            const { title, content, author } = <span class="cstat-no" title="statement not covered" >req.body;</span>
-            const newPost = <span class="cstat-no" title="statement not covered" >yield postService.createPostService({</span>
+function createPost(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { title, content, author } = req.body;
+            const newPost = yield postService.createPostService({
                 title,
                 content,
                 author,
             });
-<span class="cstat-no" title="statement not covered" >            res.status(201).json(newPost);</span>
+            res.status(201).json(newPost);
         }
         catch (err) {
 <span class="cstat-no" title="statement not covered" >            res.status(500).json({ message: "Erro ao criar post" });</span>
@@ -517,7 +517,7 @@ function <span class="fstat-no" title="function not covered" >deletePost(</span>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-13T22:58:52.180Z
+                at 2025-07-14T00:21:54.722Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

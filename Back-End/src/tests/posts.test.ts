@@ -1,22 +1,40 @@
 import request from "supertest";
 import mongoose from "mongoose";
-import { app } from "..";
+import { app } from "../app"; // Certifique-se de que o import é do app.ts
 import { MONGO_URI } from "../config";
 
-// Conectar ao banco de dados antes de todos os testes
-beforeAll(async () => {
-  await mongoose.disconnect();
+// Aumenta o timeout do Jest para 30 segundos, por segurança
+jest.setTimeout(30000);
 
-  //URI de teste
+// --- HOOKS DE SETUP E TEARDOWN ---
+
+beforeAll(async () => {
+  // Gera a URI de teste a partir da sua URI principal
   const testMongoUri = MONGO_URI.replace(
     "/TechChallengeEducaTC",
     "/TechChallengeEducaTC_Test"
   );
-  await mongoose.connect(testMongoUri);
+
+  console.log(
+    `INFO: Tentando conectar ao banco de dados de teste: ${testMongoUri}`
+  );
+
+  try {
+    // Conecta ao banco de dados de teste
+    await mongoose.connect(testMongoUri);
+    console.log("SUCCESS: Conexão com o banco de dados de teste estabelecida!");
+  } catch (error) {
+    console.error(
+      "ERROR: Falha ao conectar ao banco de dados de teste.",
+      error
+    );
+    // Lança o erro para que o Jest pare a execução se a conexão falhar
+    throw error;
+  }
 });
 
-// Limpa os dados
 afterEach(async () => {
+  // Limpa todas as coleções do banco de dados após cada teste
   const collections = mongoose.connection.collections;
   for (const key in collections) {
     const collection = collections[key];
@@ -24,12 +42,14 @@ afterEach(async () => {
   }
 });
 
-// Desconecta do banco
 afterAll(async () => {
+  // Fecha a conexão com o banco de dados após todos os testes
   await mongoose.connection.close();
+  console.log("INFO: Conexão com o banco de dados de teste fechada.");
 });
 
-// -------------------------------Teste rotas publicas------------------------------------
+// --- SUÍTE DE TESTES ---
+
 describe("Testes das Rotas de Posts", () => {
   it("Deve listar todos os posts públicos", async () => {
     const response = await request(app).get("/api/posts");
@@ -56,11 +76,10 @@ describe("Testes das Rotas de Posts", () => {
       .set("Authorization", `Bearer ${alunoToken}`)
       .send({ title: "Post do Aluno", content: "Conteúdo", author: "Aluno" });
 
-    // 3. Verifica se o acesso foi proibido
+    // 3. Verifica se o acesso foi proibido (o correto aqui seria 403 Forbidden)
     expect(postRes.status).toBe(403);
   });
 
-  // -------------------------------Teste rotas privadas------------------------------------
   it('Deve permitir que um "professor" crie um post', async () => {
     // 1. Cria e loga um professor
     await request(app).post("/api/users/register").send({
@@ -75,7 +94,7 @@ describe("Testes das Rotas de Posts", () => {
     });
     const professorToken = loginRes.body.token;
 
-    // 2. Tenta criar um post com o token do professor
+    // 2. Cria um post com o token do professor
     const postRes = await request(app)
       .post("/api/posts")
       .set("Authorization", `Bearer ${professorToken}`)
