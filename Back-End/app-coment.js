@@ -33,6 +33,14 @@
 // É um operador lógico de negação lógica, função de inverter um valor booleano.
 // usamos para checar se uma variável não é null ou undefined
 // garantir que um valor obrigatório não é vazio
+// 
+//    Schema
+// O schema é um modelo que define a estrutura lógica de um banco de dados, incuindo tabelas, colunas, tipos de dados, relacionamentos e restrições
+// Ele é usado no banco de dados mostrando como os dados são organizados e como eles podem ser acessados
+// 
+//    Timetamps
+// Usando para documentar e registrar quando um evento ocorreu, como a criação ou modificação de um arquivo, ou o envio de uma mensagem
+// Em alguem casos podem ser usados para verificar a autenticidade de um documento eletronico
 //          INSTALAÇÃOES
 // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 // npm install express
@@ -40,3 +48,4 @@
 // tsc --init / create tsconfig.json
 // npm i --save-dev @types/express` / para o tsconfig
 // npm install --save-dev jest
+// docker-compose up --build

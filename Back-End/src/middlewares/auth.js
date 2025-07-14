@@ -12,14 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authenticate = void 0;
+exports.authorize = exports.authenticate = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../config");
 const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const token = (_a = req.header("Authorization")) === null || _a === void 0 ? void 0 : _a.replace("Bearer ", "");
     if (!token) {
-        res.status(401).json({ message: "Token missing" });
+        res.status(401).json({ message: "Acesso negado! Token não forncecido" });
         return;
     }
     try {
@@ -28,8 +28,45 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         return next();
     }
     catch (_b) {
-        res.status(401).json({ message: "Invalid token" });
+        res.status(401).json({ message: "Token inválido" });
         return;
     }
 });
 exports.authenticate = authenticate;
+// export const authorize = (roles: string[]): RequestHandler => {
+//   return (req, res, next) => {
+//     if (!req.user) {
+//       res.status(401).json({ message: "Token inválido ou expirado." });
+//       return;
+//     }
+//     if (!roles.includes(req.user.role)) {
+//       res.status(403).json({
+//         message:
+//           "Acesso proibido. Você não tem permissão para executar esta ação.",
+//       });
+//       return;
+//     }
+//     next();
+//   };
+// };
+const authorize = (...roles) => {
+    return (req, res, next) => {
+        var _a;
+        console.log("ROLE no token:", (_a = req.user) === null || _a === void 0 ? void 0 : _a.role);
+        console.log("Roles permitidas:", roles);
+        if (!req.user) {
+            res
+                .status(401)
+                .json({ message: "Acesso negado. Faça login para continuar." });
+            return;
+        }
+        if (!roles.includes(req.user.role)) {
+            res.status(403).json({
+                message: "Acesso proibido. Você não tem permissão para executar esta ação.",
+            });
+            return;
+        }
+        next();
+    };
+};
+exports.authorize = authorize;

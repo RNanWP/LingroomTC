@@ -34,18 +34,9 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const auth_1 = require("../middlewares/auth");
 const asyncHandler_1 = require("../utils/asyncHandler");
-const postController = __importStar(require("../controllers/postController"));
+const userController = __importStar(require("../controllers/userController"));
 const router = (0, express_1.Router)();
-// Rotas publicas
-router.get("/posts", (0, asyncHandler_1.asyncHandler)(postController.getAllPosts));
-router.get("/posts/search", (0, asyncHandler_1.asyncHandler)(postController.searchPosts));
-router.get("/posts/:id", (0, asyncHandler_1.asyncHandler)(postController.getPostById));
-// Rotas protegidas
-router.post("/posts", auth_1.authenticate, (0, auth_1.authorize)("professor", "administrador"), (0, asyncHandler_1.asyncHandler)(postController.createPost));
-router.put("/posts/:id", auth_1.authenticate, (0, auth_1.authorize)("professor", "administrador"), (0, asyncHandler_1.asyncHandler)(postController.updatePost));
-router.delete("/posts/:id", auth_1.authenticate, (0, auth_1.authorize)("professor", "administrador"), (0, asyncHandler_1.asyncHandler)(postController.deletePost));
-// Rota ADM
-router.get("/admin/posts", auth_1.authenticate, (0, auth_1.authorize)("administrador"), (0, asyncHandler_1.asyncHandler)(postController.getAdminPosts));
+router.post("/register", (0, asyncHandler_1.asyncHandler)(userController.register));
+router.post("/login", (0, asyncHandler_1.asyncHandler)(userController.login));
 exports.default = router;
