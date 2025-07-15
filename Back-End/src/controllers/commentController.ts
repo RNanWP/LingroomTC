@@ -45,7 +45,7 @@ export async function createComment(req: Request, res: Response) {
 export async function createReply(req: Request, res: Response) {
   try {
     const { content } = req.body;
-    const { postId, commentId } = req.params;
+    const { commentId } = req.params;
     const authorId = (req.user as any).id;
 
     if (!content) {
@@ -56,7 +56,6 @@ export async function createReply(req: Request, res: Response) {
 
     const newReply = await commentService.createReplyService({
       content,
-      postId,
       authorId,
       parentCommentId: commentId,
     });

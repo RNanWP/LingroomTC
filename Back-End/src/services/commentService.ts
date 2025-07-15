@@ -7,10 +7,6 @@ export async function getCommentsByPostService(
 ): Promise<IComment[]> {
   return Comment.find({ post: postId, parentComment: null })
     .populate("author", "name")
-    .populate({
-      path: "replies",
-      populate: { path: "author", select: "name" },
-    })
     .sort({ createdAt: "desc" });
 }
 
@@ -31,13 +27,17 @@ export async function createCommentService(data: {
 // cria resposta
 export async function createReplyService(data: {
   content: string;
-  postId: string;
   authorId: string;
   parentCommentId: string;
 }): Promise<IComment> {
+  const parentComment = await Comment.findById(data.parentCommentId);
+  if (!parentComment) {
+    throw new Error("Comentário principal não encontrado");
+  }
+
   const reply = new Comment({
     content: data.content,
-    post: data.postId,
+    post: parentComment.post,
     author: data.authorId,
     parentComment: data.parentCommentId,
   });

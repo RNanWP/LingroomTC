@@ -91,7 +91,7 @@ function createReply(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { content } = req.body;
-            const { postId, commentId } = req.params;
+            const { commentId } = req.params;
             const authorId = req.user.id;
             if (!content) {
                 return res
@@ -100,7 +100,6 @@ function createReply(req, res) {
             }
             const newReply = yield commentService.createReplyService({
                 content,
-                postId,
                 authorId,
                 parentCommentId: commentId,
             });

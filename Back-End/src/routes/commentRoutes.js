@@ -39,7 +39,7 @@ const asyncHandler_1 = require("../utils/asyncHandler");
 const commentController = __importStar(require("../controllers/commentController"));
 const router = (0, express_1.Router)();
 // mostra todos os comentários
-router.get("/post/:postId/comments", (0, asyncHandler_1.asyncHandler)(commentController.getCommentsByPost));
+router.get("/posts/:postId/comments", (0, asyncHandler_1.asyncHandler)(commentController.getCommentsByPost));
 // Alunos cria comentário
 router.post("/posts/:postId/comments", auth_1.authenticate, (0, asyncHandler_1.asyncHandler)(commentController.createComment));
 // Proff e ADM respondem comentário

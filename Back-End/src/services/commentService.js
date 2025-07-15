@@ -18,10 +18,6 @@ function getCommentsByPostService(postId) {
     return __awaiter(this, void 0, void 0, function* () {
         return Comment_1.Comment.find({ post: postId, parentComment: null })
             .populate("author", "name")
-            .populate({
-            path: "replies",
-            populate: { path: "author", select: "name" },
-        })
             .sort({ createdAt: "desc" });
     });
 }
@@ -39,9 +35,13 @@ function createCommentService(data) {
 // cria resposta
 function createReplyService(data) {
     return __awaiter(this, void 0, void 0, function* () {
+        const parentComment = yield Comment_1.Comment.findById(data.parentCommentId);
+        if (!parentComment) {
+            throw new Error("Comentário principal não encontrado");
+        }
         const reply = new Comment_1.Comment({
             content: data.content,
-            post: data.postId,
+            post: parentComment.post,
             author: data.authorId,
             parentComment: data.parentCommentId,
         });

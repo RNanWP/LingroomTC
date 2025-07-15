@@ -1,6 +1,6 @@
 Preciso arrumar a autenticação e role do usuario, ele esta conseguindo criar Posts mas nao deveria
 
-
+Preciso arrumar o erro no teste de não estar listando todos os comentarios de um post
 
 
 

@@ -7,7 +7,7 @@ const router = Router();
 
 // mostra todos os comentários
 router.get(
-  "/post/:postId/comments",
+  "/posts/:postId/comments",
   asyncHandler(commentController.getCommentsByPost)
 );
 
