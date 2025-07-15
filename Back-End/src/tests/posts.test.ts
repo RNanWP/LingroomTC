@@ -1,15 +1,13 @@
 import request from "supertest";
 import mongoose from "mongoose";
-import { app } from "../app"; // Certifique-se de que o import é do app.ts
+import { app } from "../app";
 import { MONGO_URI } from "../config";
 
 // Aumenta o timeout do Jest para 30 segundos, por segurança
 jest.setTimeout(30000);
 
-// --- HOOKS DE SETUP E TEARDOWN ---
-
 beforeAll(async () => {
-  // Gera a URI de teste a partir da sua URI principal
+  // Gera a URI de teste
   const testMongoUri = MONGO_URI.replace(
     "/TechChallengeEducaTC",
     "/TechChallengeEducaTC_Test"
@@ -20,7 +18,7 @@ beforeAll(async () => {
   );
 
   try {
-    // Conecta ao banco de dados de teste
+    // Conecta ao banco de teste
     await mongoose.connect(testMongoUri);
     console.log("SUCCESS: Conexão com o banco de dados de teste estabelecida!");
   } catch (error) {
@@ -34,7 +32,7 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  // Limpa todas as coleções do banco de dados após cada teste
+  // Limpa todas as coleções do banco de dados a cada teste
   const collections = mongoose.connection.collections;
   for (const key in collections) {
     const collection = collections[key];
@@ -43,12 +41,10 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  // Fecha a conexão com o banco de dados após todos os testes
+  // Fecha a conexão com o banco de dados a todos os testes
   await mongoose.connection.close();
   console.log("INFO: Conexão com o banco de dados de teste fechada.");
 });
-
-// --- SUÍTE DE TESTES ---
 
 describe("Testes das Rotas de Posts", () => {
   it("Deve listar todos os posts públicos", async () => {
@@ -108,4 +104,11 @@ describe("Testes das Rotas de Posts", () => {
     expect(postRes.status).toBe(201);
     expect(postRes.body).toHaveProperty("title", "Post do Professor");
   });
+});
+
+it("Deve retornar 404 ao tentar buscar um post com ID inexistente", async () => {
+  const response = await request(app).get(
+    "/api/posts/60d21b4667d0d8992e610c8b"
+  );
+  expect(response.status).toBe(404);
 });

@@ -14,17 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const app_1 = require("../app"); // Certifique-se de que o import é do app.ts
+const app_1 = require("../app");
 const config_1 = require("../config");
 // Aumenta o timeout do Jest para 30 segundos, por segurança
 jest.setTimeout(30000);
-// --- HOOKS DE SETUP E TEARDOWN ---
 beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
-    // Gera a URI de teste a partir da sua URI principal
+    // Gera a URI de teste
     const testMongoUri = config_1.MONGO_URI.replace("/TechChallengeEducaTC", "/TechChallengeEducaTC_Test");
     console.log(`INFO: Tentando conectar ao banco de dados de teste: ${testMongoUri}`);
     try {
-        // Conecta ao banco de dados de teste
+        // Conecta ao banco de teste
         yield mongoose_1.default.connect(testMongoUri);
         console.log("SUCCESS: Conexão com o banco de dados de teste estabelecida!");
     }
@@ -35,7 +34,7 @@ beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 afterEach(() => __awaiter(void 0, void 0, void 0, function* () {
-    // Limpa todas as coleções do banco de dados após cada teste
+    // Limpa todas as coleções do banco de dados a cada teste
     const collections = mongoose_1.default.connection.collections;
     for (const key in collections) {
         const collection = collections[key];
@@ -43,11 +42,10 @@ afterEach(() => __awaiter(void 0, void 0, void 0, function* () {
     }
 }));
 afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
-    // Fecha a conexão com o banco de dados após todos os testes
+    // Fecha a conexão com o banco de dados a todos os testes
     yield mongoose_1.default.connection.close();
     console.log("INFO: Conexão com o banco de dados de teste fechada.");
 }));
-// --- SUÍTE DE TESTES ---
 describe("Testes das Rotas de Posts", () => {
     it("Deve listar todos os posts públicos", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app_1.app).get("/api/posts");
@@ -101,3 +99,7 @@ describe("Testes das Rotas de Posts", () => {
         expect(postRes.body).toHaveProperty("title", "Post do Professor");
     }));
 });
+it("Deve retornar 404 ao tentar buscar um post com ID inexistente", () => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield (0, supertest_1.default)(app_1.app).get("/api/posts/60d21b4667d0d8992e610c8b");
+    expect(response.status).toBe(404);
+}));

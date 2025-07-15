@@ -11,10 +11,8 @@ export async function register(req: Request, res: Response) {
       password,
       role,
     });
-    
-    // const user = await userService.registerUserService(req.body);
 
-    // remove a senha por segurança
+    // const user = await userService.registerUserService(req.body);
     const userResponse = user.toObject();
     delete userResponse.password;
 
@@ -22,7 +20,7 @@ export async function register(req: Request, res: Response) {
       .status(201)
       .json({ message: "Usuário criado com sucesso!", user: userResponse });
   } catch (error: any) {
-    // tratar email duplicado
+    // trata email duplicado
     if (error.code === 11000) {
       return res.status(409).json({ message: "Este email já está em uso." });
     }
@@ -43,7 +41,6 @@ export async function login(req: Request, res: Response) {
     }
 
     const { user, token } = result;
-    // remove a senha por segurança
     const userResponse = user.toObject();
     delete userResponse.password;
 

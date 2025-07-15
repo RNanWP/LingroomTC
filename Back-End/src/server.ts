@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { app } from "./app"; // Importa o app configurado
+import { app } from "./app";
 import { MONGO_URI, PORT } from "./config";
 
 if (process.env.NODE_ENV !== "test") {

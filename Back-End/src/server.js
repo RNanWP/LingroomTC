@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
-const app_1 = require("./app"); // Importa o app configurado
+const app_1 = require("./app");
 const config_1 = require("./config");
 if (process.env.NODE_ENV !== "test") {
     mongoose_1.default

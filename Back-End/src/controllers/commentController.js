@@ -42,58 +42,74 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.register = register;
-exports.login = login;
-const userService = __importStar(require("../services/userServices"));
-// registro
-function register(req, res) {
+exports.getCommentsByPost = getCommentsByPost;
+exports.createComment = createComment;
+exports.createReply = createReply;
+const commentService = __importStar(require("../services/commentService"));
+// listar comentarios
+function getCommentsByPost(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { name, email, password, role } = req.body;
-            const user = yield userService.registerUserService({
-                name,
-                email,
-                password,
-                role,
-            });
-            // const user = await userService.registerUserService(req.body);
-            const userResponse = user.toObject();
-            delete userResponse.password;
-            res
-                .status(201)
-                .json({ message: "Usuário criado com sucesso!", user: userResponse });
+            const comments = yield commentService.getCommentsByPostService(req.params.postId);
+            res.status(200).json(comments);
         }
         catch (error) {
-            // trata email duplicado
-            if (error.code === 11000) {
-                return res.status(409).json({ message: "Este email já está em uso." });
-            }
             res
                 .status(500)
-                .json({ message: "Erro ao registrar usuário", error: error.message });
+                .json({ message: "Erro ao buscar comentários", error: error.message });
         }
     });
 }
-// login
-function login(req, res) {
+// Criar comentario
+function createComment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { email, password } = req.body;
-            const result = yield userService.loginUserService(email, password);
-            if (!result) {
-                return res.status(401).json({ message: "Email ou senha inválidos." });
+            const { content } = req.body;
+            const postId = req.params.postId;
+            const authorId = req.user.id;
+            if (!content) {
+                return res
+                    .status(400)
+                    .json({ message: "O conteúdo do cometário é obrigatório" });
             }
-            const { user, token } = result;
-            const userResponse = user.toObject();
-            delete userResponse.password;
-            res
-                .status(200)
-                .json({ message: "Login bem-sucedido!", user: userResponse, token });
+            const newComment = yield commentService.createCommentService({
+                content,
+                postId,
+                authorId,
+            });
+            res.status(201).json(newComment);
         }
         catch (error) {
             res
                 .status(500)
-                .json({ message: "Erro ao fazer login", error: error.message });
+                .json({ message: "Erro ao criar comentário", error: error.message });
+        }
+    });
+}
+// Criar resposta
+function createReply(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { content } = req.body;
+            const { postId, commentId } = req.params;
+            const authorId = req.user.id;
+            if (!content) {
+                return res
+                    .status(400)
+                    .json({ message: "O conteúdo da resposta é obrigatório" });
+            }
+            const newReply = yield commentService.createReplyService({
+                content,
+                postId,
+                authorId,
+                parentCommentId: commentId,
+            });
+            res.status(201).json(newReply);
+        }
+        catch (error) {
+            res
+                .status(500)
+                .json({ message: "Erro ao criar resposta", error: error.message });
         }
     });
 }
