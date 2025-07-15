@@ -1,0 +1,44 @@
+name: CI para Back-End
+
+on:
+  push:
+    branches: [ main ]
+    
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:latest 
+        ports:
+          - 27017:27017
+
+    steps:
+      # 1. Clona o seu repositório para dentro da máquina virtual
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # 2. Configura o ambiente Node.js na versão 18.x
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # 3. Instala todas as dependências do projeto
+      - name: Instalar dependências
+        run: npm install
+
+      # 4. Roda o script de teste definido no seu package.json
+      - name: Rodar os testes
+        run: npm test
+        env:
+         
+          MONGO_URI: mongodb://mongo:27017/TechChallengeEducaTC_Test
+     
+          JWT_SECRET: ${{ secrets.JWT_SECRET_TEST }}
+          PORT: 3001
