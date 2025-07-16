@@ -13,3 +13,5 @@ if (process.env.NODE_ENV !== "test") {
     })
     .catch((err) => console.error("Falha ao conectar ao MongoDB", err));
 }
+
+export { app };
