@@ -3,15 +3,10 @@ import mongoose from "mongoose";
 import { app } from "../app";
 import { MONGO_URI } from "../config";
 
-// Aumenta o timeout do Jest para 30 segundos, por segurança
 jest.setTimeout(30000);
 
 beforeAll(async () => {
-  // Gera a URI de teste
-  const testMongoUri = MONGO_URI.replace(
-    "/TechChallengeEducaTC",
-    "/TechChallengeEducaTC_Test"
-  );
+  const testMongoUri = MONGO_URI.replace("/LingroomTC", "/LingroomTC_Test");
 
   console.log(
     `INFO: Tentando conectar ao banco de dados de teste: ${testMongoUri}`
@@ -26,13 +21,12 @@ beforeAll(async () => {
       "ERROR: Falha ao conectar ao banco de dados de teste.",
       error
     );
-    // Lança o erro para que o Jest pare a execução se a conexão falhar
     throw error;
   }
 });
 
 afterEach(async () => {
-  // Limpa todas as coleções do banco de dados a cada teste
+  // Limpa todas as coleções do banco de dados
   const collections = mongoose.connection.collections;
   for (const key in collections) {
     const collection = collections[key];
@@ -41,7 +35,7 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  // Fecha a conexão com o banco de dados a todos os testes
+  // Fecha a conexão com o banco de dados
   await mongoose.connection.close();
   console.log("INFO: Conexão com o banco de dados de teste fechada.");
 });
@@ -70,9 +64,9 @@ describe("Testes das Rotas de Posts", () => {
     const postRes = await request(app)
       .post("/api/posts")
       .set("Authorization", `Bearer ${alunoToken}`)
-      .send({ title: "Post do Aluno", content: "Conteúdo", author: "Aluno" });
+      .send({ title: "Post do Aluno", content: "Conteúdo" });
 
-    // 3. Verifica se o acesso foi proibido (o correto aqui seria 403 Forbidden)
+    // 3. Verifica se o acesso foi proibido
     expect(postRes.status).toBe(403);
   });
 
@@ -97,7 +91,6 @@ describe("Testes das Rotas de Posts", () => {
       .send({
         title: "Post do Professor",
         content: "Conteúdo",
-        author: "Professor",
       });
 
     // 3. Verifica se o post foi criado com sucesso

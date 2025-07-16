@@ -50,7 +50,8 @@ export async function getPostById(req: Request, res: Response) {
 
 export async function createPost(req: Request, res: Response) {
   try {
-    const { title, content, author } = req.body;
+    const { title, content } = req.body;
+    const author = (req.user as any).id;
     const newPost = await postService.createPostService({
       title,
       content,

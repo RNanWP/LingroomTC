@@ -1,5 +1,5 @@
 import request from "supertest";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { app } from "../app";
 import { Post } from "../models/Post";
 import { IUser, User } from "../models/User";
@@ -7,8 +7,15 @@ import { Comment } from "../models/Comment";
 
 jest.setTimeout(30000);
 
-let professor: IUser;
-let aluno: IUser;
+interface TestUser {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+let professor: TestUser;
+let aluno: TestUser;
 let professorToken: string;
 let alunoToken: string;
 let testPostId: string;
@@ -16,13 +23,14 @@ let testCommentId: string;
 
 beforeAll(async () => {
   const testMongoUri = (process.env.MONGO_URI || "").replace(
-    "/TechChallengeEducaTC",
-    "/TechChallengeEducaTC_Test_Comments"
+    "/LingroomTC",
+    "/LingroomTC_Test_Comments"
   );
-  await mongoose.connect(testMongoUri);
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(testMongoUri.replace("localhost", "127.0.0.1"));
+  }
 });
 
-// Para garantir um estado limpo
 beforeEach(async () => {
   // Limpar coleções
   await User.deleteMany({});
@@ -61,14 +69,14 @@ beforeEach(async () => {
   const post = await new Post({
     title: "Post para Comentários",
     content: "Conteúdo",
-    author: professor._id,
+    author: professor._id.toString(),
   }).save();
   testPostId = post.id;
 
   const comment = await new Comment({
     content: "Comentário inicial.",
-    post: testPostId,
-    author: aluno._id,
+    post: new Types.ObjectId(testPostId),
+    author: new Types.ObjectId(aluno._id),
   }).save();
   testCommentId = comment.id;
 });
@@ -115,122 +123,3 @@ describe("Testes das Rotas de Comentários", () => {
     expect(res.status).toBe(403);
   });
 });
-
-// --------------------------------- TESTES --------------------------------
-// let professor: IUser;
-// let aluno: IUser;
-// let professorToken: string;
-// let alunoToken: string;
-// let testPostId: string;
-// let testCommentId: string;
-
-// beforeAll(async () => {
-//   const testMongoUri = (process.env.MONGO_URI || "").replace(
-//     "/TechChallengeEducaTC",
-//     "/TechChallengeEducaTC_Test_Comments"
-//   );
-//   await mongoose.connect(testMongoUri);
-
-//   beforeEach(async () => {
-//     // Limpa dados
-//     await User.deleteMany({});
-//     await Post.deleteMany({});
-//     await Comment.deleteMany({});
-
-//     // Cria e loga aluno
-//     const aluno = await new User({
-//       name: "Aluno Comentarista",
-//       email: "aluno.comment@teste.com",
-//       password: "123",
-//       role: "aluno",
-//     }).save();
-//     const alunoLoginRes = await request(app).post("/api/users/login").send({
-//       email: "aluno.comment@teste.com",
-//       password: "123",
-//     });
-//     alunoToken = alunoLoginRes.body.token;
-
-//     // Cria e loga professor
-//     const professor = await new User({
-//       name: "Professor Comentarista",
-//       email: "professor.comment@teste.com",
-//       password: "123",
-//       role: "professor",
-//     }).save();
-//     const profLoginRes = await request(app).post("/api/users/login").send({
-//       email: "professor.comment@teste.com",
-//       password: "123",
-//     });
-//     professorToken = profLoginRes.body.token;
-
-//     // Criar um post de teste
-//     const post = await new Post({
-//       title: "Post para Comentários",
-//       content: "Conteúdo do post...",
-//       author: professor.id,
-//     }).save();
-//     testPostId = post.id;
-
-//     // Criar um comentário de teste
-//     const comment = await new Comment({
-//       content: "Comentário inicial para testes.",
-//       post: testPostId,
-//       author: aluno.id,
-//     }).save();
-//     testCommentId = comment.id;
-//   });
-// });
-
-// afterAll(async () => {
-//   await mongoose.connection.close();
-// });
-
-// describe("Testes das Rotas de Comentários", () => {
-//   it("Deve permitir que um aluno crie um novo comentário", async () => {
-//     const res = await request(app)
-//       .post(`/api/posts/${testPostId}/comments`)
-//       .set("Authorization", `Bearer ${alunoToken}`)
-//       .send({ content: "Ótimo post, muito informativo!" });
-
-//     expect(res.status).toBe(201);
-//     expect(res.body).toHaveProperty(
-//       "content",
-//       "Ótimo post, muito informativo!"
-//     );
-//   });
-
-//   it("NÃO deve permitir que um usuário não autenticado comente", async () => {
-//     const res = await request(app)
-//       .post(`/api/posts/${testPostId}/comments`)
-//       .send({ content: "Comentário anônimo." });
-
-//     expect(res.status).toBe(401);
-//   });
-
-//   it("Deve listar todos os comentários de um post", async () => {
-//     const res = await request(app).get(`/api/posts/${testPostId}/comments`);
-
-//     expect(res.status).toBe(200);
-//     expect(res.body).toBeInstanceOf(Array);
-//     expect(res.body.length).toBeGreaterThan(0);
-//   });
-
-//   it("Deve permitir que um professor responda a um comentário", async () => {
-//     const res = await request(app)
-//       .post(`/api/comments/${testCommentId}/reply`)
-//       .set("Authorization", `Bearer ${professorToken}`)
-//       .send({ content: "Obrigado pelo feedback!" });
-
-//     expect(res.status).toBe(201);
-//     expect(res.body.parentComment).toBe(testCommentId);
-//   });
-
-//   it("NÃO deve permitir que um aluno responda a um comentário", async () => {
-//     const res = await request(app)
-//       .post(`/api/comments/${testCommentId}/reply`)
-//       .set("Authorization", `Bearer ${alunoToken}`)
-//       .send({ content: "De nada, professor!" });
-
-//     expect(res.status).toBe(403);
-//   });
-// });
