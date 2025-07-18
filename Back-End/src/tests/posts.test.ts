@@ -6,7 +6,7 @@ import { MONGO_URI } from "../config";
 jest.setTimeout(30000);
 
 beforeAll(async () => {
-  const testMongoUri = MONGO_URI.replace("/LingroomTC", "/LingroomTC_Test");
+  const testMongoUri = MONGO_URI;
 
   console.log(
     `INFO: Tentando conectar ao banco de dados de teste: ${testMongoUri}`

@@ -39,6 +39,6 @@ jobs:
         working-directory: ./Back-End
         run: npm test
         env:
-          MONGO_URI: mongodb://mongo:27017/LingroomTC_Test
+          MONGO_URI: mongodb://localhost:27017/LingroomTC_Test
           JWT_SECRET: ${{ secrets.JWT_SECRET_TEST }}
           PORT: 3001
