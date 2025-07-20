@@ -18,7 +18,10 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/package*.json ./
+
 COPY --from=builder /usr/src/app/node_modules ./node_modules
+
+RUN npm install --only=production
 
 COPY --from=builder /usr/src/app/dist ./dist
 
