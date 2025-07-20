@@ -1,5 +1,5 @@
 # Build
-FROM node:20-slim as builder
+FROM node:20-slim AS builder
 
 WORKDIR /usr/src/app
 
@@ -25,4 +25,4 @@ COPY --from=builder /usr/src/app/dist ./dist
 EXPOSE 3000
 
 # Comando para iniciar a aplicação
-CMD ["npm", "run", "dev", "dist/server.js"]
+CMD ["npm", "run", "start", "dev", "dist/server.js"]
