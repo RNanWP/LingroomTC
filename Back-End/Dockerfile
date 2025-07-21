@@ -25,6 +25,6 @@ COPY --from=builder /usr/src/app/dist ./dist
 EXPOSE 3000
 
 # Comando para iniciar a aplicação
-# CMD ["npm", "start", "run", "dev", "dist/server.js"]
+CMD ["npm", "start", "run", "dev", "dist/server.js"]
 # CMD ["npm", "start"]
-CMD [ "ls", "-R" ]
+# CMD [ "ls", "-R" ]
