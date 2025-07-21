@@ -2,13 +2,8 @@ Preciso arrumar a autenticação e role do usuario, ele esta conseguindo criar P
 
 Preciso arrumar o erro no teste de não estar listando todos os comentarios de um post
 
-
-
-
-
-
-
-
+COISAS A MELHORAR:
+Uma melhoria futura seria criar um middleware de tratamento de erros global no app.ts. Esse middleware seria o último a ser adicionado (app.use(errorHandler)) e capturaria todos os erros lançados na aplicação, centralizando a lógica de formatação de respostas de erro. Isso deixaria seus controllers ainda mais limpos.
 
 _______________________________________________________________________________________________________________
 
