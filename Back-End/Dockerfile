@@ -12,7 +12,7 @@ RUN npm run build
 # RUN npm prune --production
 
 # Produção
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /usr/src/app
 

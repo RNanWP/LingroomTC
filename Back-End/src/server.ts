@@ -2,42 +2,42 @@ import mongoose from "mongoose";
 import { app } from "./app";
 import { MONGO_URI, PORT } from "./config";
 
-const startServer = async () => {
-  if (!MONGO_URI) {
-    console.error(
-      "ERRO FATAL: A variável de ambiente MONGO_URI não está definida."
-    );
-    process.exit(1);
-  }
+// const startServer = async () => {
+//   if (!MONGO_URI) {
+//     console.error(
+//       "ERRO FATAL: A variável de ambiente MONGO_URI não está definida."
+//     );
+//     process.exit(1);
+//   }
 
-  try {
-    await mongoose.connect(MONGO_URI);
-    console.log("MongoDB conectado com sucesso!");
+//   try {
+//     await mongoose.connect(MONGO_URI);
+//     console.log("MongoDB conectado com sucesso!");
 
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando na porta ${PORT}`);
-    });
-  } catch (err) {
-    console.error("Falha ao conectar ao MongoDB", err);
-    process.exit(1);
-  }
-};
+//     app.listen(PORT, () => {
+//       console.log(`Servidor rodando na porta ${PORT}`);
+//     });
+//   } catch (err) {
+//     console.error("Falha ao conectar ao MongoDB", err);
+//     process.exit(1);
+//   }
+// };
 
-startServer();
-
-export { app };
-
-// --------------------------------------
-// if (process.env.NODE_ENV !== "test") {
-//   mongoose
-//     .connect(MONGO_URI)
-//     .then(() => {
-//       console.log("MongoDB conectado");
-//       app.listen(PORT, () => {
-//         console.log(`Servidor rodando na porta ${PORT}`);
-//       });
-//     })
-//     .catch((err) => console.error("Falha ao conectar ao MongoDB", err));
-// }
+// startServer();
 
 // export { app };
+
+// --------------------------------------
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(MONGO_URI)
+    .then(() => {
+      console.log("MongoDB conectado");
+      app.listen(PORT, () => {
+        console.log(`Servidor rodando na porta ${PORT}`);
+      });
+    })
+    .catch((err) => console.error("Falha ao conectar ao MongoDB", err));
+}
+
+export { app };
