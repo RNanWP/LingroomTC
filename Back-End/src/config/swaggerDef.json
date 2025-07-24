@@ -1,0 +1,439 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "LingroomTC Swagger",
+    "version": "1.0.0",
+    "description": "API para o projeto LingroomTC, um sistema de gerenciamento de posts e comentários."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor de Desenvolvimento Local"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticação",
+      "description": "API para registro e login de usuários"
+    },
+    { "name": "Posts", "description": "API para gerenciamento de posts" },
+    {
+      "name": "Comentários",
+      "description": "API para gerenciamento de comentários"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Post": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "author": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "content": { "type": "string" },
+          "post": { "type": "string" },
+          "author": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string" },
+              "name": { "type": "string" }
+            }
+          },
+          "parentComment": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["aluno", "professor", "administrador"]
+          }
+        }
+      },
+      "UserInput": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "format": "password" },
+          "role": {
+            "type": "string",
+            "enum": ["aluno", "professor", "administrador"]
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/users/register": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Registra um novo usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "409": { "description": "O email fornecido já está em uso." }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Autentica um usuário e retorna um token JWT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login bem-sucedido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "user": { "$ref": "#/components/schemas/User" },
+                    "token": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Email ou senha inválidos." }
+        }
+      }
+    },
+    "/api/posts": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Lista todos os posts",
+        "responses": {
+          "200": {
+            "description": "Uma lista de posts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Post" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Cria um novo post",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "content": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/search": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Busca posts por um termo",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "O termo a ser buscado."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Uma lista de posts que correspondem à busca.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Post" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Busca um post específico pelo ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "O ID do post."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O post encontrado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "404": { "description": "Post não encontrado." }
+        }
+      },
+      "put": {
+        "tags": ["Posts"],
+        "summary": "Atualiza um post existente",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "O ID do post a ser atualizado."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "content": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Posts"],
+        "summary": "Deleta um post",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "O ID do post a ser deletado."
+          }
+        ],
+        "responses": {
+          "204": { "description": "Post deletado com sucesso (sem conteúdo)." }
+        }
+      }
+    },
+    "/api/admin/posts": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Retorna todos os posts para gerenciamento (Rota de ADM)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Uma lista completa de todos os posts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Post" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{postId}/comments": {
+      "get": {
+        "tags": ["Comentários"],
+        "summary": "Lista todos os comentários de um post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "postId",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "O ID do post."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Uma lista de comentários.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Comment" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Comentários"],
+        "summary": "Cria um novo comentário em um post",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "postId",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "O ID do post a ser comentado."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "content": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comentário criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Comment" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comments/{commentId}/reply": {
+      "post": {
+        "tags": ["Comentários"],
+        "summary": "Responde a um comentário existente",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "commentId",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "O ID do comentário a ser respondido."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "content": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Resposta criada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Comment" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

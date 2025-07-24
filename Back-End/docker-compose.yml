@@ -7,9 +7,9 @@ services:
     environment:
       - MONGO_URI=mongodb://mongo:27017/LingroomTC
       - PORT=3000
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+    # volumes:
+    #   - .:/usr/src/app
+    #   - /usr/src/app/node_modules
     depends_on:
       - mongo
   mongo:

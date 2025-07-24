@@ -25,7 +25,6 @@ Testes: Jest + Supertest (cobertura mínima de 20%)
 
 Documentação: Swagger (OpenAPI) + README.md
 
-
 _______________________________________________________________________________________________________________
 
 Estrutura de Pastas
