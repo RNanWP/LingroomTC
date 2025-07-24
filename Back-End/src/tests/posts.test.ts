@@ -3,6 +3,7 @@ import { app } from "../app";
 import { Post } from "../models/Post";
 import { User } from "../models/User";
 import { Types } from "mongoose";
+import * as postService from "../services/postServices";
 
 // jest.setTimeout(30000);
 
@@ -199,5 +200,25 @@ describe("Testes das Rotas de Posts", () => {
       .set("Authorization", `Bearer ${adminToken}`);
     expect(adminRes.status).toBe(200);
     expect(adminRes.body.length).toBeGreaterThan(0);
+  });
+});
+
+// Testes de Falhas Post
+describe("Testes de Falha do Post Controller", () => {
+  it("Deve retornar status 500 se o serviço falhar ao criar um post", async () => {
+    const createPostSpy = jest
+      .spyOn(postService, "createPostService")
+      .mockRejectedValue(new Error("Erro de banco de dados simulado"));
+
+    // tenta criar o post
+    const postRes = await request(app)
+      .post("/api/posts")
+      .set("Authorization", `Bearer ${professorToken}`)
+      .send({ title: "Post que vai falhar", content: "Conteúdo" });
+
+    expect(postRes.status).toBe(500);
+    expect(postRes.body).toHaveProperty("message", "Erro ao criar post");
+
+    createPostSpy.mockRestore();
   });
 });
