@@ -6,7 +6,7 @@ import { IUser, User } from "../models/User";
 import { Comment } from "../models/Comment";
 import { MONGO_URI } from "../config";
 
-jest.setTimeout(30000);
+// jest.setTimeout(30000);
 
 interface TestUser {
   _id: string;
@@ -22,12 +22,12 @@ let alunoToken: string;
 let testPostId: string;
 let testCommentId: string;
 
-beforeAll(async () => {
-  const testMongoUri = MONGO_URI;
-  if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(testMongoUri);
-  }
-});
+// beforeAll(async () => {
+//   const testMongoUri = MONGO_URI;
+//   if (mongoose.connection.readyState === 0) {
+//     await mongoose.connect(testMongoUri);
+//   }
+// });
 
 beforeEach(async () => {
   // Limpar coleções

@@ -53,3 +53,4 @@
 // npm install --save-dev jest
 // docker-compose up --build
 // npm run build
+// npm i fastify-type-provider-zod @fastify/cors zod

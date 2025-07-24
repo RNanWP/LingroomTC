@@ -9,7 +9,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# RUN npm prune --production
+RUN npm prune --production
 
 # Produção
 FROM node:20-slim

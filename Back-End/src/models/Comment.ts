@@ -4,7 +4,7 @@ export interface IComment extends Document {
   content: string;
   post: Types.ObjectId;
   author: Types.ObjectId;
-  parentComment?: Types.ObjectId; // Referencia outro comentário
+  parentComment?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
