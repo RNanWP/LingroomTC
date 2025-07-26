@@ -5,43 +5,6 @@ import { User } from "../models/User";
 import { Types } from "mongoose";
 import * as postService from "../services/postServices";
 
-// jest.setTimeout(30000);
-
-// beforeAll(async () => {
-//   const testMongoUri = MONGO_URI;
-
-//   console.log(
-//     `INFO: Tentando conectar ao banco de dados de teste: ${testMongoUri}`
-//   );
-
-//   try {
-//     // Conecta ao banco de teste
-//     await mongoose.connect(testMongoUri);
-//     console.log("SUCCESS: Conexão com o banco de dados de teste estabelecida!");
-//   } catch (error) {
-//     console.error(
-//       "ERROR: Falha ao conectar ao banco de dados de teste.",
-//       error
-//     );
-//     throw error;
-//   }
-// });
-
-// afterEach(async () => {
-//   // Limpa todas as coleções do banco de dados
-//   const collections = mongoose.connection.collections;
-//   for (const key in collections) {
-//     const collection = collections[key];
-//     await collection.deleteMany({});
-//   }
-// });
-
-// afterAll(async () => {
-//   // Fecha a conexão com o banco de dados
-//   await mongoose.connection.close();
-//   console.log("INFO: Conexão com o banco de dados de teste fechada.");
-// });
-
 interface TestUser {
   _id: string;
   name: string;
@@ -55,6 +18,9 @@ let professorToken: string;
 let adminToken: string;
 
 beforeEach(async () => {
+  await User.deleteMany({});
+  await Post.deleteMany({});
+
   // Cria e loga um professor
   const profRegRes = await request(app).post("/api/users/register").send({
     name: "Professor Teste Posts",
@@ -150,7 +116,6 @@ describe("Testes das Rotas de Posts", () => {
   });
 
   // Testando as rotas Put, Del, Search do professor e ADM
-
   it("Deve permitir que um administrador atualize um post", async () => {
     const post = await new Post({
       title: "Post Original",
@@ -189,6 +154,7 @@ describe("Testes das Rotas de Posts", () => {
     expect(searchRes.body[0].title).toBe("Aprendendo Node.js");
   });
 
+  // Admin
   it("Deve permitir que um administrador veja a lista de posts de admin", async () => {
     await new Post({
       title: "Post Secreto",
@@ -201,6 +167,34 @@ describe("Testes das Rotas de Posts", () => {
     expect(adminRes.status).toBe(200);
     expect(adminRes.body.length).toBeGreaterThan(0);
   });
+
+  it("Deve permitir que um administrador delete qualquer post", async () => {
+    const post = await new Post({
+      title: "Post de Outro Usuário",
+      content: "Conteúdo",
+      author: new Types.ObjectId(professor._id),
+    }).save();
+
+    const deleteRes = await request(app)
+      .delete(`/api/posts/${post.id}`)
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(deleteRes.status).toBe(204);
+
+    //Verifica se o post realmente foi deletado do banco
+    const postInDb = await Post.findById(post.id);
+    expect(postInDb).toBeNull();
+  });
+
+  it("Deve retornar 404 ao tentar deletar um post que não existe", async () => {
+    const nonExistentId = "60d21b4667d0d8992e610c8b";
+
+    const deleteRes = await request(app)
+      .delete(`/api/posts/${nonExistentId}`)
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(deleteRes.status).toBe(404);
+  });
 });
 
 // Testes de Falhas Post
@@ -210,7 +204,6 @@ describe("Testes de Falha do Post Controller", () => {
       .spyOn(postService, "createPostService")
       .mockRejectedValue(new Error("Erro de banco de dados simulado"));
 
-    // tenta criar o post
     const postRes = await request(app)
       .post("/api/posts")
       .set("Authorization", `Bearer ${professorToken}`)

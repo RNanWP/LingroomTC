@@ -49,3 +49,12 @@ export async function loginUserService(
 
   return { user, token };
 }
+
+// Admin Delete
+export async function deleteUserService(id: string): Promise<IUser | null> {
+  const user = await User.findByIdAndDelete(id);
+  if (!user) {
+    return null;
+  }
+  return user;
+}

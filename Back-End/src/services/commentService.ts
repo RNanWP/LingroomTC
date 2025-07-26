@@ -43,3 +43,11 @@ export async function createReplyService(data: {
   });
   return await reply.save();
 }
+
+// Admin Delete
+export async function deleteCommentService(
+  id: string
+): Promise<IComment | null> {
+  await Comment.deleteMany({ parentComment: id });
+  return Comment.findByIdAndDelete(id);
+}

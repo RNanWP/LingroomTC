@@ -17,14 +17,15 @@ FROM node:20-slim
 WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/package*.json ./
-RUN npm install --only=production
 
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 COPY --from=builder /usr/src/app/dist ./dist
 
 EXPOSE 3000
 
 # Comando para iniciar a aplicação
-CMD ["npm", "start", "run", "dev", "dist/server.js"]
+CMD [ "node", "dist/server.js" ]
+# CMD ["npm", "start", "run", "dev", "dist/server.js"]
 # CMD ["npm", "start"]
 # CMD [ "ls", "-R" ]

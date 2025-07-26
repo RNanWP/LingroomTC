@@ -66,3 +66,21 @@ export async function createReply(req: Request, res: Response) {
       .json({ message: "Erro ao criar resposta", error: error.message });
   }
 }
+
+// Admin Delete
+export async function deleteComment(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const deletedComment = await commentService.deleteCommentService(id);
+
+    if (!deletedComment) {
+      return res.status(404).json({ message: "Comentário não encontrado." });
+    }
+
+    res.status(204).send();
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Erro ao deletar comentário", error: error.message });
+  }
+}
