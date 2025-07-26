@@ -1,12 +1,9 @@
 import request from "supertest";
-import mongoose, { Types } from "mongoose";
+import { Types } from "mongoose";
 import { app } from "../app";
 import { Post } from "../models/Post";
-import { IUser, User } from "../models/User";
+import { User } from "../models/User";
 import { Comment } from "../models/Comment";
-import { MONGO_URI } from "../config";
-
-// jest.setTimeout(30000);
 
 interface TestUser {
   _id: string;
@@ -17,17 +14,12 @@ interface TestUser {
 
 let professor: TestUser;
 let aluno: TestUser;
+let admin: TestUser;
 let professorToken: string;
 let alunoToken: string;
+let adminToken: string;
 let testPostId: string;
 let testCommentId: string;
-
-// beforeAll(async () => {
-//   const testMongoUri = MONGO_URI;
-//   if (mongoose.connection.readyState === 0) {
-//     await mongoose.connect(testMongoUri);
-//   }
-// });
 
 beforeEach(async () => {
   // Limpar coleções
@@ -63,6 +55,19 @@ beforeEach(async () => {
   professorToken = profLoginRes.body.token;
   professor = profLoginRes.body.user;
 
+  // Admin
+  const adminRegRes = await request(app).post("/api/users/register").send({
+    name: "Admin Comentarista",
+    email: "admin.comment@teste.com",
+    password: "123",
+    role: "administrador",
+  });
+  admin = adminRegRes.body.user;
+  const adminLoginRes = await request(app)
+    .post("/api/users/login")
+    .send({ email: "admin.comment@teste.com", password: "123" });
+  adminToken = adminLoginRes.body.token;
+
   // Cria post e comentário
   const post = await new Post({
     title: "Post para Comentários",
@@ -77,10 +82,6 @@ beforeEach(async () => {
     author: new Types.ObjectId(aluno._id),
   }).save();
   testCommentId = comment.id;
-});
-
-afterAll(async () => {
-  await mongoose.connection.close();
 });
 
 describe("Testes das Rotas de Comentários", () => {
@@ -119,5 +120,15 @@ describe("Testes das Rotas de Comentários", () => {
       .send({ content: "De nada, professor!" });
 
     expect(res.status).toBe(403);
+  });
+
+  it("Deve permitir que um administrador delete um comentário de um aluno", async () => {
+    const deleteRes = await request(app)
+      .delete(`/api/admin/comments/${testCommentId}`)
+      .set("Authorization", `Bearer ${adminToken}`);
+    expect(deleteRes.status).toBe(204);
+
+    const commentInDb = await Comment.findById(testCommentId);
+    expect(commentInDb).toBeNull();
   });
 });

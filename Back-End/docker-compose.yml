@@ -7,6 +7,7 @@ services:
     environment:
       - MONGO_URI=mongodb://mongo:27017/LingroomTC
       - PORT=3000
+      - JWT_SECRET=seuSegredoAqui
     # volumes:
     #   - .:/usr/src/app
     #   - /usr/src/app/node_modules

@@ -53,3 +53,21 @@ export async function login(req: Request, res: Response) {
       .json({ message: "Erro ao fazer login", error: error.message });
   }
 }
+
+// Admin Delete
+export async function deleteUser(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const deletedUser = await userService.deleteUserService(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "Usuário não encontrado." });
+    }
+
+    res.status(204).send();
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Erro ao deletar usuário", error: error.message });
+  }
+}

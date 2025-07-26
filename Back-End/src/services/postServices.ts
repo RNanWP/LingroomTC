@@ -19,7 +19,6 @@ export async function getAdminPostService(): Promise<IPost[]> {
   return Post.find().sort({ createdAt: -1 }).exec();
 }
 
-// ------
 export async function getAllPostsService(): Promise<IPost[]> {
   return Post.find().sort({ createdAt: -1 }).exec();
 }

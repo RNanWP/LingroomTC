@@ -4,8 +4,7 @@ import "dotenv/config";
 jest.setTimeout(30000);
 
 beforeAll(async () => {
-  const mongoUri =
-    process.env.MONGO_URI || "mongodb://localhost:27017/Lingroom_Test";
+  const mongoUri = "mongodb://localhost:27017/Lingroom_Test";
 
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(mongoUri);

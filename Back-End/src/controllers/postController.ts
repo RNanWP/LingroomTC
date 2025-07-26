@@ -75,10 +75,16 @@ export async function updatePost(req: Request, res: Response) {
   }
 }
 
+// Admin Delete
 export async function deletePost(req: Request, res: Response) {
-  const { id } = req.params;
   try {
-    await postService.deletePostService(id);
+    const { id } = req.params;
+    const deletedPost = await postService.deletePostService(id);
+
+    if (!deletedPost) {
+      return res.status(404).json({ message: "Post não encontrado" });
+    }
+
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ message: "Erro ao excluir post" });
