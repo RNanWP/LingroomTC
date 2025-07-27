@@ -22,40 +22,39 @@ let testPostId: string;
 let testCommentId: string;
 
 beforeEach(async () => {
-  // Limpar coleções
   await User.deleteMany({});
   await Post.deleteMany({});
   await Comment.deleteMany({});
 
   // Cria e loga aluno
-  await request(app).post("/api/users/register").send({
+  const alunoRegRes = await request(app).post("/api/users/register").send({
     name: "Aluno Comentarista",
     email: "aluno.comment@teste.com",
     password: "123",
     role: "aluno",
   });
+  aluno = alunoRegRes.body.user;
   const alunoLoginRes = await request(app).post("/api/users/login").send({
     email: "aluno.comment@teste.com",
     password: "123",
   });
   alunoToken = alunoLoginRes.body.token;
-  aluno = alunoLoginRes.body.user;
 
   // Cria e loga professor
-  await request(app).post("/api/users/register").send({
+  const profRegRes = await request(app).post("/api/users/register").send({
     name: "Professor Comentarista",
     email: "professor.comment@teste.com",
     password: "123",
     role: "professor",
   });
+  professor = profRegRes.body.user;
   const profLoginRes = await request(app).post("/api/users/login").send({
     email: "professor.comment@teste.com",
     password: "123",
   });
   professorToken = profLoginRes.body.token;
-  professor = profLoginRes.body.user;
 
-  // Admin
+  // Cria e loga admin
   const adminRegRes = await request(app).post("/api/users/register").send({
     name: "Admin Comentarista",
     email: "admin.comment@teste.com",
@@ -72,14 +71,14 @@ beforeEach(async () => {
   const post = await new Post({
     title: "Post para Comentários",
     content: "Conteúdo",
-    author: professor._id.toString(),
+    author: professor._id,
   }).save();
   testPostId = post.id;
 
   const comment = await new Comment({
     content: "Comentário inicial.",
-    post: new Types.ObjectId(testPostId),
-    author: new Types.ObjectId(aluno._id),
+    post: testPostId,
+    author: aluno._id,
   }).save();
   testCommentId = comment.id;
 });

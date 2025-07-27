@@ -58,7 +58,6 @@ describe("Testes das Rotas de Posts", () => {
   });
 
   it('Não deve permitir que um "aluno" crie um post', async () => {
-    // Cria e loga um aluno
     await request(app).post("/api/users/register").send({
       name: "Aluno Teste",
       email: "aluno@teste.com",
@@ -70,31 +69,15 @@ describe("Testes das Rotas de Posts", () => {
     });
     const alunoToken = loginRes.body.token;
 
-    // Tenta criar um post com o token do aluno
     const postRes = await request(app)
       .post("/api/posts")
       .set("Authorization", `Bearer ${alunoToken}`)
       .send({ title: "Post do Aluno", content: "Conteúdo" });
 
-    // Verifica se o acesso foi proibido
     expect(postRes.status).toBe(403);
   });
 
   it('Deve permitir que um "professor" crie um post', async () => {
-    // Cria e loga um professor
-    await request(app).post("/api/users/register").send({
-      name: "Professor Teste",
-      email: "professor@teste.com",
-      password: "123",
-      role: "professor",
-    });
-    const loginRes = await request(app).post("/api/users/login").send({
-      email: "professor@teste.com",
-      password: "123",
-    });
-    const professorToken = loginRes.body.token;
-
-    // Cria um post com o token do professor
     const postRes = await request(app)
       .post("/api/posts")
       .set("Authorization", `Bearer ${professorToken}`)
@@ -103,7 +86,6 @@ describe("Testes das Rotas de Posts", () => {
         content: "Conteúdo",
       });
 
-    // Verifica se o post foi criado com sucesso
     expect(postRes.status).toBe(201);
     expect(postRes.body).toHaveProperty("title", "Post do Professor");
   });
@@ -115,7 +97,6 @@ describe("Testes das Rotas de Posts", () => {
     expect(response.status).toBe(404);
   });
 
-  // Testando as rotas Put, Del, Search do professor e ADM
   it("Deve permitir que um administrador atualize um post", async () => {
     const post = await new Post({
       title: "Post Original",
@@ -154,7 +135,6 @@ describe("Testes das Rotas de Posts", () => {
     expect(searchRes.body[0].title).toBe("Aprendendo Node.js");
   });
 
-  // Admin
   it("Deve permitir que um administrador veja a lista de posts de admin", async () => {
     await new Post({
       title: "Post Secreto",
@@ -180,24 +160,19 @@ describe("Testes das Rotas de Posts", () => {
       .set("Authorization", `Bearer ${adminToken}`);
 
     expect(deleteRes.status).toBe(204);
-
-    //Verifica se o post realmente foi deletado do banco
     const postInDb = await Post.findById(post.id);
     expect(postInDb).toBeNull();
   });
 
   it("Deve retornar 404 ao tentar deletar um post que não existe", async () => {
     const nonExistentId = "60d21b4667d0d8992e610c8b";
-
     const deleteRes = await request(app)
       .delete(`/api/posts/${nonExistentId}`)
       .set("Authorization", `Bearer ${adminToken}`);
-
     expect(deleteRes.status).toBe(404);
   });
 });
 
-// Testes de Falhas Post
 describe("Testes de Falha do Post Controller", () => {
   it("Deve retornar status 500 se o serviço falhar ao criar um post", async () => {
     const createPostSpy = jest
