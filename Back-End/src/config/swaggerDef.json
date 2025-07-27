@@ -9,6 +9,10 @@
     {
       "url": "http://localhost:3000",
       "description": "Servidor de Desenvolvimento Local"
+    },
+    {
+      "url": "https://lingroomtc-egxb.onrender.com",
+      "description": "Servidor de Desenvolvimento Local"
     }
   ],
   "tags": [
