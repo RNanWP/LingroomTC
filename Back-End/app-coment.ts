@@ -49,8 +49,23 @@
 // npm install express
 // npm install -- save-dev nodemon ou npm install -g nodemon
 // tsc --init / create tsconfig.json
-// npm i --save-dev @types/express` / para o tsconfig
+// npm i --save-dev @types/express`                  /    PARA O TSCONFIG.JSON
 // npm install --save-dev jest
 // docker-compose up --build
 // npm run build
-// npm i fastify-type-provider-zod @fastify/cors zod
+
+// npm i fastify-type-provider-zod @fastify/cors zod /    NÃO UTILIZADO
+
+
+// Onde eu vejo o projeto rodando
+// http://localhost:3000/api/posts
+
+
+// Scripts para Lovable
+// 
+// Criar um pequeno footer no site para adicionar o link do meu github [https://github.com/RNanWP/LingroomTC], linkedin [https://www.linkedin.com/in/renanodev] e com algo como Direitos autorais © 2025 RenanODev Pós-Tech. Todos os direitos reservados.
+// Adicionar mais estilização no site
+// Adicionar mais funcionalidades no blog
+
+// MUDAR A URL DE http://localhost:3000/api PARA https://b4b1f9e50c27.ngrok-free.ap.
+// Okay, I want to use ngrok to simulate the backend of my existing project. Update the API base URL to https://b4b1f9e50c27.ngrok-free.app
