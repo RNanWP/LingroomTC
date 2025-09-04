@@ -1,5 +1,6 @@
 import express from "express";
 import postRoutes from "./routes/postRoutes";
+import cors from "cors";
 import userRoutes from "./routes/userRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import adminRoutes from "./routes/adminRoutes";
@@ -9,6 +10,7 @@ import swaggerDocument from "./config/swaggerDef.json";
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

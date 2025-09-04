@@ -51,7 +51,7 @@
 // tsc --init / create tsconfig.json
 // npm i --save-dev @types/express`                  /    PARA O TSCONFIG.JSON
 // npm install --save-dev jest
-// docker-compose up --build
+// npm run build
 // npm run build
 
 // npm i fastify-type-provider-zod @fastify/cors zod /    NÃO UTILIZADO
