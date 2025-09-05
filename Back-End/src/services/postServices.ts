@@ -30,6 +30,7 @@ export async function getPostByIdService(id: string): Promise<IPost | null> {
 export async function createPostService(data: {
   title: string;
   content: string;
+  imageUrl?: string;
   author: string;
 }): Promise<IPost> {
   const post = new Post(data);
