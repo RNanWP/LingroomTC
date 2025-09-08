@@ -9,7 +9,7 @@ export interface IPost {
   _id: string;
   title: string;
   content: string;
-  author: string; // This would ideally be populated with user info
+  author: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import api from "@/lib/api.ts";
+import api from "@/lib/api";
 import { IPost } from "@/types";
 
 export default function HomePage() {
@@ -30,7 +30,7 @@ export default function HomePage() {
 
     const searchTimeout = setTimeout(() => {
       fetchPosts();
-    }, 500); // Debounce search to avoid too many requests
+    }, 500); 
 
     return () => clearTimeout(searchTimeout);
   }, [searchTerm]);
