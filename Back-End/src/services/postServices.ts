@@ -20,7 +20,7 @@ export async function getAdminPostService(): Promise<IPost[]> {
 }
 
 export async function getAllPostsService(): Promise<IPost[]> {
-  return Post.find().sort({ createdAt: -1 }).exec();
+  return Post.find().sort({ createdAt: -1 }).populate("author", "name").exec();
 }
 
 export async function getPostByIdService(id: string): Promise<IPost | null> {
