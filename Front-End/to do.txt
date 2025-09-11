@@ -1,0 +1,11 @@
+Idealmente, meu back-end teria uma rota /api/posts/author/{authorId} mas está como professor, preciso olhar depois e corrigir
+
+
+
+// src/app/posts/[id]/page.tsx
+      {/* A seção de comentários pode ser um componente separado com "use client" */}
+      {/* <CommentsSection postId={post._id} /> */}
+      <h2>Comentários (Funcionalidade a ser implementada aqui)</h2>
+    </div>
+  );
+}
