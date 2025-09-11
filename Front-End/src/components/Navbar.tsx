@@ -1,5 +1,9 @@
+// src/components/Navbar.tsx
+"use client";
+
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Search, LogOut, Plus, Settings, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -8,24 +12,28 @@ import { toast } from "@/hooks/use-toast";
 
 const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push(`/`);
     }
   };
 
   const handleLogout = () => {
     logout();
     toast({
-      title: "Logged out successfully",
-      description: "You have been logged out of LingroomTC",
+      title: "Logout realizado com sucesso",
+      description: "Você foi desconectado do LingroomTC",
     });
-    navigate("/");
+    router.push("/");
   };
 
   const canCreatePosts =
@@ -35,9 +43,8 @@ const Navbar: React.FC = () => {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-soft">
       <div className="container flex h-16 items-center justify-between">
-        {/* Logo */}
         <Link
-          to="/"
+          href="/"
           className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
         >
           <BookOpen className="h-8 w-8 text-primary" />
@@ -52,7 +59,7 @@ const Navbar: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               type="text"
-              placeholder="Search posts..."
+              placeholder="Pesquisar posts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 w-full"
@@ -74,17 +81,17 @@ const Navbar: React.FC = () => {
                 </div>
               </div>
 
-              {/* Botão Criar Postagem (para professores e administradores) */}
+              {/* Botão Criar Postagem */}
               {canCreatePosts && (
                 <Button asChild size="sm" className="hidden sm:flex">
-                  <Link to="/create-post">
+                  <Link href="/create-post">
                     <Plus className="h-4 w-4 mr-2" />
-                    Create Post
+                    Criar Post
                   </Link>
                 </Button>
               )}
 
-              {/* Link do painel de administração */}
+              {/* Painel de administração */}
               {canAccessAdmin && (
                 <Button
                   asChild
@@ -92,7 +99,7 @@ const Navbar: React.FC = () => {
                   size="sm"
                   className="hidden sm:flex"
                 >
-                  <Link to="/admin">
+                  <Link href="/admin">
                     <Settings className="h-4 w-4 mr-2" />
                     Admin
                   </Link>
@@ -109,31 +116,31 @@ const Navbar: React.FC = () => {
             <>
               {/* Botões de login/registro */}
               <Button asChild variant="ghost" size="sm">
-                <Link to="/login">Login</Link>
+                <Link href="/login">Login</Link>
               </Button>
               <Button asChild size="sm">
-                <Link to="/register">Register</Link>
+                <Link href="/register">Registrar</Link>
               </Button>
             </>
           )}
         </div>
       </div>
 
-      {/* Menu móvel (se necessário) */}
+      {/* Menu móvel */}
       {isAuthenticated && (
         <div className="sm:hidden border-t border-border/40 px-4 py-2">
           <div className="flex items-center justify-between">
             {canCreatePosts && (
               <Button asChild size="sm" variant="outline">
-                <Link to="/create-post">
+                <Link href="/create-post">
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Post
+                  Criar Post
                 </Link>
               </Button>
             )}
             {canAccessAdmin && (
               <Button asChild variant="outline" size="sm">
-                <Link to="/admin">
+                <Link href="/admin">
                   <Settings className="h-4 w-4 mr-2" />
                   Admin
                 </Link>
