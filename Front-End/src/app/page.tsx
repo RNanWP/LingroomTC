@@ -5,7 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { Loader2, BookOpen, AlertCircle } from "lucide-react";
 import PostCard from "@/components/PostCard";
 import { postsApi } from "@/lib/api";
-import { IPost } from "@/types";
+import { Post } from "@/types";
 import { toast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -21,7 +21,7 @@ import {
 const POSTS_PER_PAGE = 9;
 
 const HomePage: React.FC = () => {
-  const [posts, setPosts] = useState<IPost[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,7 +41,7 @@ const HomePage: React.FC = () => {
           // For search, get all results and paginate client-side for now
           const allResults = (await postsApi.searchPosts(
             searchQuery
-          )) as IPost[];
+          )) as Post[];
           const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
           const endIndex = startIndex + POSTS_PER_PAGE;
           data = allResults.slice(startIndex, endIndex);
@@ -49,7 +49,7 @@ const HomePage: React.FC = () => {
           setTotalPages(Math.ceil(allResults.length / POSTS_PER_PAGE));
         } else {
           // For regular posts, get all and paginate client-side for now
-          const allPosts = (await postsApi.getAllPosts()) as IPost[];
+          const allPosts = (await postsApi.getAllPosts()) as Post[];
           const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
           const endIndex = startIndex + POSTS_PER_PAGE;
           data = allPosts.slice(startIndex, endIndex);
@@ -241,7 +241,7 @@ const HomePage: React.FC = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {posts.map((post) => (
-                <PostCard key={post._id} post={post} />
+                <PostCard key={post.id} post={post} />
               ))}
             </div>
 
