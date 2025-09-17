@@ -1,20 +1,32 @@
-// src/app/not-found.tsx
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
 const NotFound = () => {
-  const pathname = usePathname();
+  const location = useLocation();
 
   useEffect(() => {
-    console.log("Página não encontrada:", pathname);
-  }, [pathname]);
+    console.error(
+      "404 Error: User attempted to access non-existent route:",
+      location.pathname
+    );
+  }, [location.pathname]);
 
   return (
-    <div className="text-center p-8">
-      <h1 className="text-4xl font-bold">404 - Página Não Encontrada</h1>
-      <p className="mt-4">A página que você está procurando não existe.</p>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">404</h1>
+        <p className="text-xl text-muted-foreground mb-4">
+          Oops! Page not found
+        </p>
+        <a
+          href="/"
+          className="text-primary hover:text-primary-hover font-medium underline underline-offset-4"
+        >
+          Return to Home
+        </a>
+      </div>
     </div>
   );
 };

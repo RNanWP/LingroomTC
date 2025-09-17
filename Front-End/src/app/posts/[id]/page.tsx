@@ -1,64 +1,384 @@
-// src/app/posts/[id]/page.tsx
-import api from "@/lib/api";
-import { IPost, IComment } from "@/types";
-import Link from "next/link";
-import CommentsSection from "@/components/CommentsSection";
+"use client";
 
-async function getPost(id: string): Promise<IPost | null> {
-  try {
-    const response = await fetch(`${api.defaults.baseURL}/posts/${id}`, {
-      cache: "no-store",
-    });
-    if (!response.ok) return null;
-    return response.json();
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import {
+  Calendar,
+  User,
+  MessageCircle,
+  Reply,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { postsApi, commentsApi } from "@/lib/api";
+import { IPost, IComment } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "@/hooks/use-toast";
+
+interface CommentComponentProps {
+  comment: IComment;
+  onReply: (commentId: string, content: string) => Promise<void>;
+  canReply: boolean;
+  level?: number;
 }
 
-export default async function PostDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const post = await getPost(params.id);
+const CommentComponent: React.FC<CommentComponentProps> = ({
+  comment,
+  onReply,
+  canReply,
+  level = 0,
+}) => {
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replyContent, setReplyContent] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  if (!post) {
+  const handleReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!replyContent.trim()) return;
+
+    try {
+      setSubmitting(true);
+      await onReply(comment._id, replyContent.trim());
+      setReplyContent("");
+      setShowReplyForm(false);
+      toast({
+        title: "Reply posted",
+        description: "Your reply has been posted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to post reply",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  return (
+    <div className={`${level > 0 ? "ml-8 border-l-2 border-border pl-4" : ""}`}>
+      <Card className="gradient-card shadow-soft">
+        <CardHeader className="pb-3">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <User className="h-4 w-4" />
+            <span className="font-medium">{comment.author.name}</span>
+            <span>•</span>
+            <span>{formatDate(comment.createdAt)}</span>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+            {comment.content}
+          </p>
+
+          {canReply && (
+            <div className="mt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowReplyForm(!showReplyForm)}
+                className="text-primary hover:text-primary-hover"
+              >
+                <Reply className="h-4 w-4 mr-2" />
+                Reply
+              </Button>
+            </div>
+          )}
+
+          {showReplyForm && (
+            <form onSubmit={handleReply} className="mt-4 space-y-3">
+              <Textarea
+                placeholder="Write your reply..."
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                disabled={submitting}
+                className="min-h-[100px]"
+              />
+              <div className="flex space-x-2">
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={submitting || !replyContent.trim()}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Posting...
+                    </>
+                  ) : (
+                    "Post Reply"
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowReplyForm(false)}
+                  disabled={submitting}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Nested replies */}
+      {comment.replies && comment.replies.length > 0 && (
+        <div className="mt-4 space-y-4">
+          {comment.replies.map((reply) => (
+            <CommentComponent
+              key={reply.id}
+              comment={reply}
+              onReply={onReply}
+              canReply={canReply}
+              level={level + 1}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const PostDetailPage: React.FC = () => {
+  const params = useParams();
+  const id = params.id as string;
+  const { user, isAuthenticated } = useAuth();
+  const [post, setPost] = useState<IPost | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [newComment, setNewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const canReply = user?.role === "professor" || user?.role === "administrador";
+
+  useEffect(() => {
+    const fetchPostAndComments = async () => {
+      if (!id) return;
+
+      try {
+        setLoading(true);
+        const [postData, commentsData] = await Promise.all([
+          postsApi.getPost(id),
+          commentsApi.getPostComments(id),
+        ]);
+
+        setPost(postData as IPost);
+        setComments(commentsData as Comment[]);
+      } catch (err: any) {
+        setError(err.message || "Failed to load post");
+        toast({
+          title: "Error loading post",
+          description: err.message || "Failed to load post",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPostAndComments();
+  }, [id]);
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim() || !id) return;
+
+    try {
+      setSubmitting(true);
+      const comment = (await commentsApi.createComment(
+        id,
+        newComment.trim()
+      )) as Comment;
+      setComments([...comments, comment]);
+      setNewComment("");
+      toast({
+        title: "Comment posted",
+        description: "Your comment has been posted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to post comment",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReply = async (commentId: string, content: string) => {
+    await commentsApi.replyToComment(commentId, content);
+    // Refresh comments to show the new reply
+    if (id) {
+      const updatedComments = (await commentsApi.getPostComments(
+        id
+      )) as Comment[];
+      setComments(updatedComments);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  if (loading) {
     return (
-      <div className="container mx-auto p-4 text-center">
-        <h1 className="text-4xl font-bold">Post Não Encontrado</h1>
-        <Link
-          href="/"
-          className="text-blue-500 hover:underline mt-4 inline-block"
-        >
-          Voltar para a Home
-        </Link>
+      <div className="min-h-screen bg-background">
+        <div className="container py-8">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2 text-lg text-muted-foreground">
+              Loading post...
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container py-8">
+          <Alert variant="destructive" className="max-w-2xl mx-auto">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error || "Post not found"}</AlertDescription>
+          </Alert>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      {/* Imagem do post */}
-      {post.imageUrl && (
-        <img
-          src={post.imageUrl}
-          alt={post.title}
-          className="w-full h-96 object-cover rounded-lg mb-4"
-        />
-      )}
+    <div className="min-h-screen bg-background">
+      <div className="container py-8 max-w-4xl">
+        {/* Post Content */}
+        <article className="mb-8">
+          <Card className="gradient-card shadow-medium">
+            <CardHeader>
+              <h1 className="text-3xl md:text-4xl font-heading font-bold text-balance">
+                {post.title}
+              </h1>
 
-      <h1 className="text-4xl font-bold mb-2">{post.title}</h1>
-      <p className="text-gray-600 mb-6">
-        by {post.author?.name || "Autor desconhecido"}
-      </p>
+              <div className="flex items-center space-x-4 text-muted-foreground">
+                <div className="flex items-center space-x-2">
+                  <User className="h-5 w-5" />
+                  <Link
+                    href={`/author/${post.author._id}`}
+                    className="font-medium hover:text-primary transition-colors"
+                  >
+                    {post.author.name}
+                  </Link>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-5 w-5" />
+                  <span>{formatDate(post.createdAt)}</span>
+                </div>
+              </div>
+            </CardHeader>
 
-      <div className="prose lg:prose-xl max-w-none">{post.content}</div>
+            <CardContent>
+              <div className="prose prose-lg max-w-none">
+                <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                  {post.content}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </article>
 
-      <hr className="my-8" />
+        {/* Comments Section */}
+        <section>
+          <div className="flex items-center space-x-2 mb-6">
+            <MessageCircle className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-heading font-semibold">
+              Comments ({comments.length})
+            </h2>
+          </div>
 
-      <CommentsSection postId={post._id} />
+          {/* Add Comment Form */}
+          {isAuthenticated && (
+            <Card className="gradient-card shadow-soft mb-6">
+              <CardContent className="pt-6">
+                <form onSubmit={handleCommentSubmit} className="space-y-4">
+                  <Textarea
+                    placeholder="Share your thoughts..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    disabled={submitting}
+                    className="min-h-[120px]"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={submitting || !newComment.trim()}
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Posting...
+                      </>
+                    ) : (
+                      "Post Comment"
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Comments List */}
+          <div className="space-y-6">
+            {comments.length === 0 ? (
+              <div className="text-center py-8">
+                <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-lg text-muted-foreground">No comments yet</p>
+                <p className="text-sm text-muted-foreground">
+                  {isAuthenticated
+                    ? "Be the first to share your thoughts!"
+                    : "Sign in to join the discussion"}
+                </p>
+              </div>
+            ) : (
+              comments.map((comment) => (
+                <CommentComponent
+                  key={comment.id}
+                  comment={comment}
+                  onReply={handleReply}
+                  canReply={canReply}
+                />
+              ))
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
-}
+};
+
+export default PostDetailPage;
