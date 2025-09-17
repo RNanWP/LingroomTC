@@ -8,4 +8,4 @@ Idealmente, meu back-end teria uma rota /api/posts/author/{authorId} mas está c
       <h2>Comentários (Funcionalidade a ser implementada aqui)</h2>
     </div>
   );
-}
+};
