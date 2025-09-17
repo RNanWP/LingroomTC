@@ -1,9 +1,9 @@
-// src/components/Navbar.tsx
 "use client";
 
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Search, LogOut, Plus, Settings, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -13,25 +13,21 @@ import { toast } from "@/hooks/use-toast";
 const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("search") || ""
-  );
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      router.push(`/`);
     }
   };
 
   const handleLogout = () => {
     logout();
     toast({
-      title: "Logout realizado com sucesso",
-      description: "Você foi desconectado do LingroomTC",
+      title: "Logged out successfully",
+      description: "You have been logged out of LingroomTC",
     });
     router.push("/");
   };
@@ -43,6 +39,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-soft">
       <div className="container flex h-16 items-center justify-between">
+        {/* Logo */}
         <Link
           href="/"
           className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
@@ -53,25 +50,28 @@ const Navbar: React.FC = () => {
           </span>
         </Link>
 
-        {/* Barra de pesquisa */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-md mx-8">
+        {/* Search Bar */}
+        <form
+          onSubmit={handleSearch}
+          className="flex-1 max-w-sm mx-2 md:max-w-md md:mx-8"
+        >
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               type="text"
-              placeholder="Pesquisar posts..."
+              placeholder="Search posts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full"
+              className="pl-10 w-full text-sm"
             />
           </div>
         </form>
 
-        {/* Ações de navegação */}
-        <div className="flex items-center space-x-4">
+        {/* Navigation Actions */}
+        <div className="flex items-center space-x-2 md:space-x-4">
           {isAuthenticated ? (
             <>
-              {/* Informações do usuário */}
+              {/* User Info */}
               <div className="hidden md:flex items-center space-x-2">
                 <div className="text-sm">
                   <p className="font-medium">{user?.name}</p>
@@ -81,17 +81,17 @@ const Navbar: React.FC = () => {
                 </div>
               </div>
 
-              {/* Botão Criar Postagem */}
+              {/* Create Post Button (for professors and admins) */}
               {canCreatePosts && (
                 <Button asChild size="sm" className="hidden sm:flex">
                   <Link href="/create-post">
                     <Plus className="h-4 w-4 mr-2" />
-                    Criar Post
+                    Create Post
                   </Link>
                 </Button>
               )}
 
-              {/* Painel de administração */}
+              {/* Admin Dashboard Link */}
               {canAccessAdmin && (
                 <Button
                   asChild
@@ -114,19 +114,28 @@ const Navbar: React.FC = () => {
             </>
           ) : (
             <>
-              {/* Botões de login/registro */}
-              <Button asChild variant="ghost" size="sm">
+              {/* Login/Register Buttons */}
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="text-xs md:text-sm px-2 md:px-4"
+              >
                 <Link href="/login">Login</Link>
               </Button>
-              <Button asChild size="sm">
-                <Link href="/register">Registrar</Link>
+              <Button
+                asChild
+                size="sm"
+                className="text-xs md:text-sm px-2 md:px-4"
+              >
+                <Link href="/register">Register</Link>
               </Button>
             </>
           )}
         </div>
       </div>
 
-      {/* Menu móvel */}
+      {/* Mobile Menu (if needed) */}
       {isAuthenticated && (
         <div className="sm:hidden border-t border-border/40 px-4 py-2">
           <div className="flex items-center justify-between">
@@ -134,7 +143,7 @@ const Navbar: React.FC = () => {
               <Button asChild size="sm" variant="outline">
                 <Link href="/create-post">
                   <Plus className="h-4 w-4 mr-2" />
-                  Criar Post
+                  Create Post
                 </Link>
               </Button>
             )}
