@@ -84,3 +84,16 @@ export async function deleteComment(req: Request, res: Response) {
       .json({ message: "Erro ao deletar comentário", error: error.message });
   }
 }
+
+// Admin: Listar todos os comentários
+export async function getAllComments(req: Request, res: Response) {
+  try {
+    const comments = await commentService.getAllCommentsService();
+    res.status(200).json(comments);
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Erro ao buscar todos os comentários",
+      error: error.message,
+    });
+  }
+}

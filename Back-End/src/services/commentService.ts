@@ -1,5 +1,4 @@
 import { Comment, IComment } from "../models/Comment";
-import { Types } from "mongoose";
 
 // busca comentários
 export async function getCommentsByPostService(
@@ -50,4 +49,14 @@ export async function deleteCommentService(
 ): Promise<IComment | null> {
   await Comment.deleteMany({ parentComment: id });
   return Comment.findByIdAndDelete(id);
+}
+
+// Admin: Retorna todos os comentários
+export async function getAllCommentsService(): Promise<IComment[]> {
+  const comments = await Comment.find()
+    .populate("author", "name")
+    .sort({ createdAt: "desc" })
+    .exec();
+
+  return comments.filter((comment: IComment) => comment.author);
 }

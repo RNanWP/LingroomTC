@@ -14,4 +14,8 @@ router.get("/posts/search", asyncHandler(postController.searchPosts));
 router.delete("/users/:id", asyncHandler(userController.deleteUser));
 router.delete("/comments/:id", asyncHandler(commentController.deleteComment));
 
+router.get("/posts", asyncHandler(postController.getAdminPosts));
+router.get("/users", asyncHandler(userController.getAllUsers));
+router.get("/comments", asyncHandler(commentController.getAllComments));
+
 export default router;
