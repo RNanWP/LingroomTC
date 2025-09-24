@@ -1,3 +1,4 @@
+/* src/app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,45 +10,30 @@
     /* Educational platform color palette */
     --background: 0 0% 100%;
     --foreground: 215 25% 27%;
-
     --card: 0 0% 100%;
     --card-foreground: 215 25% 27%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 27%;
-
-    /* Academic blue primary colors */
     --primary: 213 94% 68%;
     --primary-foreground: 0 0% 100%;
     --primary-hover: 213 94% 63%;
-
-    /* Professional secondary colors */
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 215 25% 27%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 197 100% 95%;
     --accent-foreground: 213 94% 68%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 213 94% 68%;
-
     --radius: 0.75rem;
-
-    /* Educational platform specific tokens */
     --academic-navy: 215 100% 15%;
     --academic-blue: 213 94% 68%;
     --academic-light: 197 100% 95%;
     --success: 142 76% 36%;
     --warning: 38 92% 50%;
-
-    /* Gradients */
     --gradient-primary: linear-gradient(
       135deg,
       hsl(213 94% 68%),
@@ -59,76 +45,13 @@
       hsl(197 89% 48% / 0.05)
     );
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 40% 98%));
-
-    /* Shadows */
     --shadow-soft: 0 2px 15px -3px hsl(213 94% 68% / 0.1),
       0 10px 20px -2px hsl(213 94% 68% / 0.04);
     --shadow-medium: 0 4px 25px -5px hsl(213 94% 68% / 0.15),
       0 10px 35px -3px hsl(213 94% 68% / 0.08);
     --shadow-strong: 0 10px 40px -15px hsl(213 94% 68% / 0.25);
-
-    /* Typography */
     --font-heading: "Inter", system-ui, -apple-system, sans-serif;
     --font-body: "Inter", system-ui, -apple-system, sans-serif;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    /* Dark mode academic colors */
-    --background: 215 100% 4%;
-    --foreground: 0 0% 95%;
-
-    --card: 215 100% 6%;
-    --card-foreground: 0 0% 95%;
-
-    --popover: 215 100% 6%;
-    --popover-foreground: 0 0% 95%;
-
-    --primary: 213 94% 68%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 215 25% 15%;
-    --secondary-foreground: 0 0% 95%;
-
-    --muted: 215 25% 15%;
-    --muted-foreground: 215 10% 65%;
-
-    --accent: 215 25% 15%;
-    --accent-foreground: 213 94% 68%;
-
-    --destructive: 0 62.8% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 215 25% 20%;
-    --input: 215 25% 20%;
-    --ring: 213 94% 68%;
-
-    /* Dark mode gradients */
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(213 94% 68%),
-      hsl(197 89% 48%)
-    );
-    --gradient-hero: linear-gradient(
-      135deg,
-      hsl(213 94% 68% / 0.2),
-      hsl(197 89% 48% / 0.1)
-    );
-    --gradient-card: linear-gradient(145deg, hsl(215 100% 6%), hsl(215 25% 8%));
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
   }
 
   body {
@@ -146,37 +69,92 @@
   }
 }
 
+/* Component styles */
 @layer components {
   .gradient-primary {
     background: var(--gradient-primary);
   }
-
   .gradient-hero {
     background: var(--gradient-hero);
   }
-
   .gradient-card {
     background: var(--gradient-card);
   }
-
   .shadow-soft {
     box-shadow: var(--shadow-soft);
   }
-
   .shadow-medium {
     box-shadow: var(--shadow-medium);
   }
-
   .shadow-strong {
     box-shadow: var(--shadow-strong);
   }
 
-  .text-balance {
-    text-wrap: balance;
-  }
-
   /* Hover underline animation */
   .story-link {
-    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+    @apply relative inline-block;
+  }
+  .story-link::after {
+    content: "";
+    @apply absolute w-full h-0.5 bottom-0 left-0 bg-primary scale-x-0 origin-bottom-right transition-transform duration-300;
+  }
+  .story-link:hover::after {
+    @apply scale-x-100 origin-bottom-left;
+  }
+}
+
+/* Animations sem plugin extra */
+@layer utilities {
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    0% {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+  .animate-scale-in {
+    animation: scale-in 0.2s ease-out;
   }
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -75,7 +77,7 @@ const LoginPage: React.FC = () => {
             </div>
             <CardTitle className="text-2xl font-heading">
               Bem-vindo ao{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
+              <span className="gradient-primary bg-clip-text text-transparent">
                 LingroomTC
               </span>
             </CardTitle>
@@ -83,8 +85,7 @@ const LoginPage: React.FC = () => {
               Faça login em sua conta para continuar aprendendo
             </CardDescription>
             <CardDescription className="text-xs text-muted-foreground mt-2 p-2 bg-muted/50 rounded">
-              <strong>Teste:</strong> maria.gonzalez@lingroomtc.edu (qualquer
-              senha)
+              <strong>Teste:</strong> admin.insomnia@teste.com (senha: 123)
             </CardDescription>
           </CardHeader>
 

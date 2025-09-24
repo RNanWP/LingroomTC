@@ -1,7 +1,6 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
 import { Loader2, BookOpen, AlertCircle } from "lucide-react";
 import PostCard from "@/components/PostCard";
 import { postsApi } from "@/lib/api";
@@ -27,7 +26,7 @@ const HomePage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search");
 
   useEffect(() => {
@@ -38,7 +37,6 @@ const HomePage: React.FC = () => {
 
         let data;
         if (searchQuery) {
-          // For search, get all results and paginate client-side for now
           const allResults = (await postsApi.searchPosts(
             searchQuery
           )) as Post[];
@@ -48,7 +46,6 @@ const HomePage: React.FC = () => {
           setTotalCount(allResults.length);
           setTotalPages(Math.ceil(allResults.length / POSTS_PER_PAGE));
         } else {
-          // For regular posts, get all and paginate client-side for now
           const allPosts = (await postsApi.getAllPosts()) as Post[];
           const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
           const endIndex = startIndex + POSTS_PER_PAGE;
@@ -59,10 +56,10 @@ const HomePage: React.FC = () => {
 
         setPosts(data);
       } catch (err: any) {
-        setError(err.message || "Failed to load posts");
+        setError(err.message || "Falha ao carregar os posts");
         toast({
-          title: "Error loading posts",
-          description: err.message || "Failed to load posts",
+          title: "Erro ao carregar os posts",
+          description: err.message || "Não foi possível carregar os posts",
           variant: "destructive",
         });
       } finally {
@@ -83,12 +80,15 @@ const HomePage: React.FC = () => {
     const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
-      // Show all pages if total pages is small
       for (let i = 1; i <= totalPages; i++) {
         items.push(
           <PaginationItem key={i}>
             <PaginationLink
-              onClick={() => handlePageChange(i)}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handlePageChange(i);
+              }}
               isActive={currentPage === i}
               className="cursor-pointer"
             >
@@ -98,11 +98,14 @@ const HomePage: React.FC = () => {
         );
       }
     } else {
-      // Show ellipsis for large number of pages
       items.push(
         <PaginationItem key={1}>
           <PaginationLink
-            onClick={() => handlePageChange(1)}
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              handlePageChange(1);
+            }}
             isActive={currentPage === 1}
             className="cursor-pointer"
           >
@@ -115,7 +118,6 @@ const HomePage: React.FC = () => {
         items.push(<PaginationEllipsis key="ellipsis1" />);
       }
 
-      // Show current page and adjacent pages
       const start = Math.max(2, currentPage - 1);
       const end = Math.min(totalPages - 1, currentPage + 1);
 
@@ -123,7 +125,11 @@ const HomePage: React.FC = () => {
         items.push(
           <PaginationItem key={i}>
             <PaginationLink
-              onClick={() => handlePageChange(i)}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handlePageChange(i);
+              }}
               isActive={currentPage === i}
               className="cursor-pointer"
             >
@@ -141,7 +147,11 @@ const HomePage: React.FC = () => {
         items.push(
           <PaginationItem key={totalPages}>
             <PaginationLink
-              onClick={() => handlePageChange(totalPages)}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handlePageChange(totalPages);
+              }}
               isActive={currentPage === totalPages}
               className="cursor-pointer"
             >
@@ -162,7 +172,7 @@ const HomePage: React.FC = () => {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <span className="ml-2 text-lg text-muted-foreground">
-              Loading posts...
+              Carregando posts...
             </span>
           </div>
         </div>
@@ -193,15 +203,15 @@ const HomePage: React.FC = () => {
               <BookOpen className="h-12 w-12 text-primary" />
             </div>
             <h1 className="text-4xl md:text-5xl font-heading font-bold text-balance mb-4">
-              Welcome to{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
+              Bem-vindo ao{" "}
+              <span className="gradient-primary bg-clip-text text-transparent">
                 LingroomTC
               </span>
             </h1>
             <p className="text-xl text-muted-foreground text-balance">
-              Your premier educational platform for learning, sharing, and
-              growing together. Discover insights from professors and engage
-              with a community of learners.
+              Sua principal plataforma educacional para aprender, compartilhar e
+              crescer juntos. Descubra insights de professores e interaja com
+              uma comunidade de alunos.
             </p>
           </div>
         </div>
@@ -214,12 +224,13 @@ const HomePage: React.FC = () => {
             <div>
               <h2 className="text-xl md:text-2xl font-heading font-semibold">
                 {searchQuery
-                  ? `Search Results for "${searchQuery}"`
-                  : "Latest Posts"}
+                  ? `Resultados para "${searchQuery}"`
+                  : "Últimas Postagens"}
               </h2>
               <p className="text-muted-foreground mt-1 text-sm md:text-base">
-                {totalCount} {totalCount === 1 ? "post" : "posts"} found
-                {totalPages > 1 && ` • Page ${currentPage} of ${totalPages}`}
+                {totalCount}{" "}
+                {totalCount === 1 ? "post encontrado" : "posts encontrados"}
+                {totalPages > 1 && ` • Página ${currentPage} de ${totalPages}`}
               </p>
             </div>
           </div>
@@ -229,12 +240,12 @@ const HomePage: React.FC = () => {
           <div className="text-center py-12">
             <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">
-              {searchQuery ? "No posts found" : "No posts yet"}
+              {searchQuery ? "Nenhum post encontrado" : "Ainda não há posts"}
             </h3>
             <p className="text-muted-foreground">
               {searchQuery
-                ? "Try adjusting your search terms or browse all posts."
-                : "Be the first to share your knowledge with the community."}
+                ? "Tente ajustar seus termos de busca."
+                : "Seja o primeiro a compartilhar seu conhecimento."}
             </p>
           </div>
         ) : (
@@ -252,9 +263,11 @@ const HomePage: React.FC = () => {
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
-                        onClick={() =>
-                          handlePageChange(Math.max(1, currentPage - 1))
-                        }
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handlePageChange(Math.max(1, currentPage - 1));
+                        }}
                         className={`cursor-pointer ${
                           currentPage === 1
                             ? "pointer-events-none opacity-50"
@@ -267,11 +280,13 @@ const HomePage: React.FC = () => {
 
                     <PaginationItem>
                       <PaginationNext
-                        onClick={() =>
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
                           handlePageChange(
                             Math.min(totalPages, currentPage + 1)
-                          )
-                        }
+                          );
+                        }}
                         className={`cursor-pointer ${
                           currentPage === totalPages
                             ? "pointer-events-none opacity-50"

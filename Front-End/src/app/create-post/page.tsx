@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save, Loader2, BookOpen } from "lucide-react";
@@ -11,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
+import { Post } from "@/types";
 
 const CreatePostPage: React.FC = () => {
   const [title, setTitle] = useState("");
@@ -20,7 +20,7 @@ const CreatePostPage: React.FC = () => {
   const { user } = useAuth();
   const router = useRouter();
 
-  // Check if user has permission to create posts
+  // Verifique se o usuário tem permissão para criar postagens
   React.useEffect(() => {
     if (!user || (user.role !== "professor" && user.role !== "administrador")) {
       router.push("/");
@@ -32,8 +32,8 @@ const CreatePostPage: React.FC = () => {
 
     if (!title.trim() || !content.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in both title and content",
+        title: "Erro de Validação",
+        description: "Por favor, preencha o título e o conteúdo.",
         variant: "destructive",
       });
       return;
@@ -41,18 +41,25 @@ const CreatePostPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const post = await postsApi.createPost(title.trim(), content.trim());
+      const newPost = (await postsApi.createPost(
+        title.trim(),
+        content.trim()
+      )) as Post;
 
       toast({
-        title: "Post Created Successfully!",
-        description: "Your post has been published to LingroomTC",
+        title: "Post Criado com Sucesso!",
+        description: "Seu post foi publicado no LingroomTC.",
       });
 
-      router.push(`/post/${(post as any).id}`);
+      if (newPost && newPost.id) {
+        router.push(`/posts/${newPost.id}`);
+      } else {
+        router.push("/");
+      }
     } catch (error: any) {
       toast({
-        title: "Failed to Create Post",
-        description: error.message || "Failed to create post",
+        title: "Falha ao Criar o Post",
+        description: error.message || "Não foi possível criar o post.",
         variant: "destructive",
       });
     } finally {
@@ -62,7 +69,9 @@ const CreatePostPage: React.FC = () => {
 
   const handleCancel = () => {
     if (title.trim() || content.trim()) {
-      if (window.confirm("Are you sure you want to discard your changes?")) {
+      if (
+        window.confirm("Você tem certeza que deseja descartar suas alterações?")
+      ) {
         router.push("/");
       }
     } else {
@@ -83,10 +92,10 @@ const CreatePostPage: React.FC = () => {
               <BookOpen className="h-8 w-8 text-primary" />
               <div>
                 <CardTitle className="text-2xl font-heading">
-                  Create New Post
+                  Criar Novo Post
                 </CardTitle>
                 <p className="text-muted-foreground mt-1">
-                  Share your knowledge with the LingroomTC community
+                  Compartilhe seu conhecimento com a comunidade LingroomTC
                 </p>
               </div>
             </div>
@@ -96,12 +105,12 @@ const CreatePostPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title" className="text-base font-medium">
-                  Post Title
+                  Título do Post
                 </Label>
                 <Input
                   id="title"
                   type="text"
-                  placeholder="Enter a compelling title for your post..."
+                  placeholder="Digite um título cativante para seu post..."
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   disabled={loading}
@@ -109,17 +118,17 @@ const CreatePostPage: React.FC = () => {
                   maxLength={200}
                 />
                 <p className="text-xs text-muted-foreground">
-                  {title.length}/200 characters
+                  {title.length}/200 caracteres
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="content" className="text-base font-medium">
-                  Post Content
+                  Conteúdo do Post
                 </Label>
                 <Textarea
                   id="content"
-                  placeholder="Write your post content here. Share your insights, knowledge, and experiences with the community..."
+                  placeholder="Escreva o conteúdo do seu post aqui. Compartilhe suas ideias, conhecimento e experiências com a comunidade..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   disabled={loading}
@@ -127,14 +136,15 @@ const CreatePostPage: React.FC = () => {
                   maxLength={10000}
                 />
                 <p className="text-xs text-muted-foreground">
-                  {content.length}/10,000 characters
+                  {content.length}/10.000 caracteres
                 </p>
               </div>
 
-              {/* Preview Section */}
               {(title.trim() || content.trim()) && (
                 <div className="space-y-2">
-                  <Label className="text-base font-medium">Preview</Label>
+                  <Label className="text-base font-medium">
+                    Pré-visualização
+                  </Label>
                   <Card className="border-2 border-dashed border-border">
                     <CardContent className="pt-6">
                       {title.trim() && (
@@ -161,7 +171,7 @@ const CreatePostPage: React.FC = () => {
                   onClick={handleCancel}
                   disabled={loading}
                 >
-                  Cancel
+                  Cancelar
                 </Button>
 
                 <Button
@@ -172,12 +182,12 @@ const CreatePostPage: React.FC = () => {
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Publishing...
+                      Publicando...
                     </>
                   ) : (
                     <>
                       <Save className="mr-2 h-4 w-4" />
-                      Publish Post
+                      Publicar Post
                     </>
                   )}
                 </Button>
@@ -186,22 +196,29 @@ const CreatePostPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Writing Tips */}
         <Card className="mt-6 gradient-card shadow-soft">
           <CardContent className="pt-6">
-            <h3 className="font-heading font-semibold mb-3">Writing Tips</h3>
+            <h3 className="font-heading font-semibold mb-3">
+              Dicas de Escrita
+            </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                • Use clear, descriptive titles that summarize your main point
+                • Use títulos claros e descritivos que resumam seu ponto
+                principal.
               </li>
               <li>
-                • Structure your content with paragraphs for better readability
+                • Estruture seu conteúdo com parágrafos para melhor
+                legibilidade.
               </li>
               <li>
-                • Include examples and real-world applications when possible
+                • Inclua exemplos e aplicações do mundo real sempre que
+                possível.
               </li>
-              <li>• Proofread your content before publishing</li>
-              <li>• Engage with comments to foster community discussion</li>
+              <li>• Revise seu conteúdo antes de publicar.</li>
+              <li>
+                • Interaja com os comentários para fomentar a discussão da
+                comunidade.
+              </li>
             </ul>
           </CardContent>
         </Card>
