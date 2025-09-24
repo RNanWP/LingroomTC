@@ -1,6 +1,9 @@
 import { User, IUser } from "../models/User";
 import { JWT_SECRET } from "../config";
+import { Post } from "../models/Post";
+import { Comment } from "../models/Comment";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 // Método usado para colcoar na role a criação do usuario para fazer testes com insominia
 interface JwtPayload {
@@ -52,11 +55,29 @@ export async function loginUserService(
 
 // Admin Delete
 export async function deleteUserService(id: string): Promise<IUser | null> {
-  const user = await User.findByIdAndDelete(id);
-  if (!user) {
-    return null;
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const user = await User.findByIdAndDelete(id, { session });
+
+    if (!user) {
+      await session.abortTransaction();
+      session.endSession();
+      return null;
+    }
+
+    await Post.deleteMany({ author: id }, { session });
+    await Comment.deleteMany({ author: id }, { session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return user;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-  return user;
 }
 
 // Admin: Retorna todos os usuários
