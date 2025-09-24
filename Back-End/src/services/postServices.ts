@@ -16,7 +16,12 @@ export async function searchPostService(query: string): Promise<IPost[]> {
 
 // Retorna todos os posts para gerenciamento (ADM)
 export async function getAdminPostService(): Promise<IPost[]> {
-  return Post.find().sort({ createdAt: -1 }).exec();
+  const posts = await Post.find()
+    .sort({ createdAt: -1 })
+    .populate("author", "name")
+    .exec();
+
+  return posts.filter((post: IPost) => post.author);
 }
 
 export async function getAllPostsService(): Promise<IPost[]> {

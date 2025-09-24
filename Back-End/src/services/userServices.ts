@@ -58,3 +58,8 @@ export async function deleteUserService(id: string): Promise<IUser | null> {
   }
   return user;
 }
+
+// Admin: Retorna todos os usuários
+export async function getAllUsersService(): Promise<IUser[]> {
+  return User.find().sort({ createdAt: -1 }).exec();
+}

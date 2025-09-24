@@ -71,3 +71,14 @@ export async function deleteUser(req: Request, res: Response) {
       .json({ message: "Erro ao deletar usuário", error: error.message });
   }
 }
+// Admin: Listar todos os usuários
+export async function getAllUsers(req: Request, res: Response) {
+  try {
+    const users = await userService.getAllUsersService();
+    res.json(users);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: "Erro ao buscar usuários", error: error.message });
+  }
+}
