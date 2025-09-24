@@ -57,8 +57,8 @@ const AdminDashboardPage: React.FC = () => {
 
         const [postsData, usersData, commentsData] = await Promise.all([
           adminApi.getAllPosts(),
-          adminApi.getAllUsers().catch(() => []), // Alternativa para endpoint ausente
-          adminApi.getAllComments().catch(() => []), // Alternativa para endpoint ausente
+          adminApi.getAllUsers().catch(() => []),
+          adminApi.getAllComments().catch(() => []),
         ]);
 
         setPosts(postsData as Post[]);

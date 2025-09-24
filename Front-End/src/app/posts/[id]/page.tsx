@@ -205,11 +205,13 @@ const PostDetailPage: React.FC = () => {
 
     try {
       setSubmitting(true);
-      const comment = (await commentsApi.createComment(
+      const newCommentData = (await commentsApi.createComment(
         id,
         newComment.trim()
       )) as Comment;
-      setComments([...comments, comment]);
+
+      setComments((prevComments) => [...prevComments, newCommentData]);
+
       setNewComment("");
       toast({
         title: "Comentário Enviado",
