@@ -20,7 +20,9 @@ export async function createCommentService(data: {
     post: data.postId,
     author: data.authorId,
   });
-  return await comment.save();
+  await comment.save();
+
+  return await comment.populate("author", "name");
 }
 
 // cria resposta
