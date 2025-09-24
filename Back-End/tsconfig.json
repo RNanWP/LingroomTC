@@ -9,9 +9,8 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "baseUrl": "./src"
-    // "rootDir": "./src"
+    "rootDir": "./src"
   },
-  "include": ["src/**/*", "jest.setup.ts", "src/tests/**/*.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
