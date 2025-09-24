@@ -11,6 +11,7 @@ export async function searchPostService(query: string): Promise<IPost[]> {
     ],
   })
     .sort({ createdAt: -1 })
+    .populate("author", "name")
     .exec();
 }
 
