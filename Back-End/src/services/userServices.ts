@@ -55,29 +55,15 @@ export async function loginUserService(
 
 // Admin Delete
 export async function deleteUserService(id: string): Promise<IUser | null> {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  try {
-    const user = await User.findByIdAndDelete(id, { session });
+  const user = await User.findByIdAndDelete(id);
 
-    if (!user) {
-      await session.abortTransaction();
-      session.endSession();
-      return null;
-    }
-
-    await Post.deleteMany({ author: id }, { session });
-    await Comment.deleteMany({ author: id }, { session });
-
-    await session.commitTransaction();
-    session.endSession();
-
-    return user;
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
+  if (!user) {
+    return null;
   }
+  await Post.deleteMany({ author: id });
+  await Comment.deleteMany({ author: id });
+
+  return user;
 }
 
 // Admin: Retorna todos os usuários
