@@ -6,14 +6,20 @@ export interface ApiError {
   status: number;
 }
 
-// Função para mapear _id para id em um objeto ou array de objetos
 const mapId = (data: any): any => {
   if (Array.isArray(data)) {
     return data.map((item) => mapId(item));
   }
-  if (data && typeof data === "object" && data._id) {
-    const { _id, ...rest } = data;
-    return { id: _id, ...rest };
+  if (data && typeof data === "object" && !data.nodeType) {
+    const newData: { [key: string]: any } = {};
+    for (const key in data) {
+      if (key === "_id") {
+        newData["id"] = data[key];
+      } else {
+        newData[key] = mapId(data[key]);
+      }
+    }
+    return newData;
   }
   return data;
 };
@@ -48,9 +54,8 @@ export const apiRequest = async <T>(
     if (response.status === 204) {
       return undefined as T;
     }
-    // Mapeamento de _id para id
     const data = await response.json();
-    return mapId(data); // <-- Mapeamento de _id para id
+    return mapId(data);
   } catch (error) {
     if (error && typeof error === "object" && "status" in error) {
       throw error;

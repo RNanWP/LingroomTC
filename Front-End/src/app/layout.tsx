@@ -12,6 +12,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 export const metadata: Metadata = {
   title: "LingroomTC",
   description: "Sua plataforma educacional para aprender e compartilhar.",
+  icons: {
+    icon: "/2-Photoroom.png",
+  },
 };
 
 export default function RootLayout({
