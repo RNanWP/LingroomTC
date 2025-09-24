@@ -1,3 +1,5 @@
+// next/src/contexts/AuthContext.tsx
+
 "use client";
 
 import React, {
@@ -7,13 +9,18 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { mockLogin, MockUser } from "../lib/mockAuth";
+import { authApi } from "@/lib/api";
+
+interface LoginResponse {
+  user: User;
+  token: string;
+}
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: "student" | "professor" | "administrador";
+  role: "aluno" | "professor" | "administrador";
 }
 
 interface AuthContextType {
@@ -30,7 +37,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
   return context;
 };
@@ -41,9 +48,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
-  );
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -59,20 +64,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      console.log("🔐 AuthContext: Starting login process...");
+      console.log("🔐 AuthContext: Iniciando processo de login...");
+      const response = (await authApi.login(email, password)) as LoginResponse;
+      setToken(response.token);
+      setUser(response.user);
 
-      // Use mock login instead of real API call
-      const { user, token } = await mockLogin(email, password);
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.user));
 
-      setToken(token);
-      setUser(user);
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      console.log("✅ AuthContext: Login successful");
+      console.log("✅ AuthContext: Login bem-sucedido");
     } catch (error) {
-      console.error("❌ AuthContext: Login error:", error);
+      console.error("❌ AuthContext: Erro de login:", error);
       throw error;
     }
   };

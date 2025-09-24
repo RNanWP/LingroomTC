@@ -1,22 +1,29 @@
-import {
-  mockPostsApi,
-  mockCommentsApi,
-  mockAdminApi,
-  createFallbackApi,
-} from "../lib/mockApi";
-
-const API_BASE_URL = "http://localhost:3001/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api";
 
 export interface ApiError {
   message: string;
   status: number;
 }
 
+// Função para mapear _id para id em um objeto ou array de objetos
+const mapId = (data: any): any => {
+  if (Array.isArray(data)) {
+    return data.map((item) => mapId(item));
+  }
+  if (data && typeof data === "object" && data._id) {
+    const { _id, ...rest } = data;
+    return { id: _id, ...rest };
+  }
+  return data;
+};
+
 export const apiRequest = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {
-  const token = localStorage.getItem("token");
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   const config: RequestInit = {
     headers: {
@@ -33,24 +40,30 @@ export const apiRequest = async <T>(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw {
-        message: errorData.message || `HTTP error! status: ${response.status}`,
+        message: errorData.message || `Erro HTTP! Status: ${response.status}`,
         status: response.status,
       } as ApiError;
     }
 
-    return await response.json();
+    if (response.status === 204) {
+      return undefined as T;
+    }
+    // Mapeamento de _id para id
+    const data = await response.json();
+    return mapId(data); // <-- Mapeamento de _id para id
   } catch (error) {
-    if (error instanceof Error && "status" in error) {
+    if (error && typeof error === "object" && "status" in error) {
       throw error;
     }
     throw {
-      message: "Network error occurred",
+      message:
+        "Ocorreu um erro de rede. Verifique sua conexão com o servidor da API.",
       status: 0,
     } as ApiError;
   }
 };
 
-// Auth API calls (still use real API since we have mock auth in AuthContext)
+// --- API de Autenticação ---
 export const authApi = {
   login: async (email: string, password: string) => {
     return apiRequest("/users/login", {
@@ -67,8 +80,8 @@ export const authApi = {
   },
 };
 
-// Real Posts API calls
-const realPostsApi = {
+// --- API de Posts ---
+export const postsApi = {
   getAllPosts: async () => {
     return apiRequest("/posts");
   },
@@ -97,11 +110,8 @@ const realPostsApi = {
   },
 };
 
-// Posts API with fallback to mock
-export const postsApi = createFallbackApi(realPostsApi, mockPostsApi);
-
-// Real Comments API calls
-const realCommentsApi = {
+// --- API de Comentários ---
+export const commentsApi = {
   getPostComments: async (postId: string) => {
     return apiRequest(`/posts/${postId}/comments`);
   },
@@ -118,17 +128,14 @@ const realCommentsApi = {
     });
   },
   deleteComment: async (commentId: string) => {
-    return apiRequest(`/admin/comments/${commentId}`, {
+    return apiRequest(`/comments/${commentId}`, {
       method: "DELETE",
     });
   },
 };
 
-// Comments API with fallback to mock
-export const commentsApi = createFallbackApi(realCommentsApi, mockCommentsApi);
-
-// Real Admin API calls
-const realAdminApi = {
+// --- API de Administração ---
+export const adminApi = {
   getAllPosts: async () => {
     return apiRequest("/admin/posts");
   },
@@ -143,12 +150,14 @@ const realAdminApi = {
       method: "DELETE",
     });
   },
+  deletePost: async (postId: string) => {
+    return apiRequest(`/admin/posts/${postId}`, {
+      method: "DELETE",
+    });
+  },
   deleteComment: async (commentId: string) => {
     return apiRequest(`/admin/comments/${commentId}`, {
       method: "DELETE",
     });
   },
 };
-
-// Admin API with fallback to mock
-export const adminApi = createFallbackApi(realAdminApi, mockAdminApi);

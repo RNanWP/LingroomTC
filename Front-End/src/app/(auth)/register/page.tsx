@@ -1,8 +1,7 @@
 "use client";
-
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, BookOpen, Loader2 } from "lucide-react";
 import { authApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -31,8 +30,8 @@ const RegisterPage: React.FC = () => {
 
     if (!name || !email || !password) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all fields",
+        title: "Erro de Validação",
+        description: "Por favor, preencha todos os campos.",
         variant: "destructive",
       });
       return;
@@ -40,8 +39,8 @@ const RegisterPage: React.FC = () => {
 
     if (password.length < 6) {
       toast({
-        title: "Validation Error",
-        description: "Password must be at least 6 characters long",
+        title: "Erro de Validação",
+        description: "A senha deve ter pelo menos 6 caracteres.",
         variant: "destructive",
       });
       return;
@@ -52,16 +51,16 @@ const RegisterPage: React.FC = () => {
       await authApi.register(name, email, password);
 
       toast({
-        title: "Registration Successful!",
+        title: "Cadastro Realizado com Sucesso!",
         description:
-          "Your account has been created. Please sign in to continue.",
+          "Sua conta foi criada. Por favor, faça login para continuar.",
       });
 
       router.push("/login");
     } catch (error: any) {
       toast({
-        title: "Registration Failed",
-        description: error.message || "Failed to create account",
+        title: "Falha no Cadastro",
+        description: error.message || "Não foi possível criar a conta.",
         variant: "destructive",
       });
     } finally {
@@ -78,24 +77,24 @@ const RegisterPage: React.FC = () => {
               <BookOpen className="h-12 w-12 text-primary" />
             </div>
             <CardTitle className="text-2xl font-heading">
-              Join{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
+              Junte-se ao{" "}
+              <span className="gradient-primary bg-clip-text text-transparent">
                 LingroomTC
               </span>
             </CardTitle>
             <CardDescription>
-              Create your account to start your learning journey
+              Crie sua conta para começar sua jornada de aprendizado
             </CardDescription>
           </CardHeader>
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">Nome</Label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Enter your full name"
+                  placeholder="Digite seu nome completo"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   disabled={loading}
@@ -108,7 +107,7 @@ const RegisterPage: React.FC = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Digite seu email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
@@ -117,12 +116,12 @@ const RegisterPage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Senha</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder="Digite sua senha"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
@@ -145,7 +144,7 @@ const RegisterPage: React.FC = () => {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Password must be at least 6 characters long
+                  A senha deve ter no mínimo 6 caracteres
                 </p>
               </div>
 
@@ -157,22 +156,22 @@ const RegisterPage: React.FC = () => {
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
+                    Criando conta...
                   </>
                 ) : (
-                  "Create Account"
+                  "Criar Conta"
                 )}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Already have an account?{" "}
+                Já tem uma conta?{" "}
                 <Link
                   href="/login"
                   className="text-primary hover:text-primary-hover font-medium underline underline-offset-4"
                 >
-                  Sign in
+                  Entrar
                 </Link>
               </p>
             </div>

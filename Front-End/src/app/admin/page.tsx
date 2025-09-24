@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { adminApi, postsApi } from "@/lib/api";
-import { IPost, IUser, IComment } from "@/types";
+import { Post, User, Comment } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,9 +31,9 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
 const AdminDashboardPage: React.FC = () => {
-  const [posts, setPosts] = useState<IPost[]>([]);
-  const [users, setUsers] = useState<IUser[]>([]);
-  const [comments, setComments] = useState<IComment[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("posts");
@@ -42,7 +42,7 @@ const AdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
   const router = useRouter();
 
-  // Check if user has admin permission
+  // Verifica se o usuário tem permissão de administrador
   React.useEffect(() => {
     if (!user || user.role !== "administrador") {
       router.push("/");
@@ -57,18 +57,19 @@ const AdminDashboardPage: React.FC = () => {
 
         const [postsData, usersData, commentsData] = await Promise.all([
           adminApi.getAllPosts(),
-          adminApi.getAllUsers().catch(() => []), // Fallback for missing endpoint
-          adminApi.getAllComments().catch(() => []), // Fallback for missing endpoint
+          adminApi.getAllUsers().catch(() => []), // Alternativa para endpoint ausente
+          adminApi.getAllComments().catch(() => []), // Alternativa para endpoint ausente
         ]);
 
-        setPosts(postsData as IPost[]);
-        setUsers(usersData as IUser[]);
-        setComments(commentsData as IComment[]);
+        setPosts(postsData as Post[]);
+        setUsers(usersData as User[]);
+        setComments(commentsData as Comment[]);
       } catch (err: any) {
-        setError(err.message || "Failed to load admin data");
+        setError(err.message || "Falha ao carregar dados do administrador");
         toast({
-          title: "Error loading admin data",
-          description: err.message || "Failed to load admin data",
+          title: "Erro ao carregar dados do administrador",
+          description:
+            err.message || "Falha ao carregar dados do administrador",
           variant: "destructive",
         });
       } finally {
@@ -84,7 +85,7 @@ const AdminDashboardPage: React.FC = () => {
   const handleDeletePost = async (postId: string) => {
     if (
       !window.confirm(
-        "Are you sure you want to delete this post? This action cannot be undone."
+        "Tem certeza que deseja excluir este post? Esta ação não pode ser desfeita."
       )
     ) {
       return;
@@ -93,14 +94,14 @@ const AdminDashboardPage: React.FC = () => {
     try {
       setDeleting(postId);
       await postsApi.deletePost(postId);
-      setPosts(posts.filter((post) => post._id !== postId));
+      setPosts(posts.filter((post) => post.id !== postId));
       toast({
-        title: "Post deleted",
-        description: "The post has been successfully deleted",
+        title: "Post excluído",
+        description: "O post foi excluído com sucesso",
       });
     } catch (error: any) {
       toast({
-        title: "Failed to delete post",
+        title: "Falha ao excluir post",
         description: error.message,
         variant: "destructive",
       });
@@ -112,7 +113,7 @@ const AdminDashboardPage: React.FC = () => {
   const handleDeleteUser = async (userId: string) => {
     if (
       !window.confirm(
-        "Are you sure you want to delete this user? This action cannot be undone."
+        "Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita."
       )
     ) {
       return;
@@ -121,14 +122,14 @@ const AdminDashboardPage: React.FC = () => {
     try {
       setDeleting(userId);
       await adminApi.deleteUser(userId);
-      setUsers(users.filter((u) => u._id !== userId));
+      setUsers(users.filter((u) => u.id !== userId));
       toast({
-        title: "User deleted",
-        description: "The user has been successfully deleted",
+        title: "Usuário excluído",
+        description: "O usuário foi excluído com sucesso",
       });
     } catch (error: any) {
       toast({
-        title: "Failed to delete user",
+        title: "Falha ao excluir usuário",
         description: error.message,
         variant: "destructive",
       });
@@ -140,7 +141,7 @@ const AdminDashboardPage: React.FC = () => {
   const handleDeleteComment = async (commentId: string) => {
     if (
       !window.confirm(
-        "Are you sure you want to delete this comment? This action cannot be undone."
+        "Tem certeza que deseja excluir este comentário? Esta ação não pode ser desfeita."
       )
     ) {
       return;
@@ -149,14 +150,14 @@ const AdminDashboardPage: React.FC = () => {
     try {
       setDeleting(commentId);
       await adminApi.deleteComment(commentId);
-      setComments(comments.filter((comment) => comment._id !== commentId));
+      setComments(comments.filter((comment) => comment.id !== commentId));
       toast({
-        title: "Comment deleted",
-        description: "The comment has been successfully deleted",
+        title: "Comentário excluído",
+        description: "O comentário foi excluído com sucesso",
       });
     } catch (error: any) {
       toast({
-        title: "Failed to delete comment",
+        title: "Falha ao excluir comentário",
         description: error.message,
         variant: "destructive",
       });
@@ -166,7 +167,7 @@ const AdminDashboardPage: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("pt-BR", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -197,7 +198,7 @@ const AdminDashboardPage: React.FC = () => {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <span className="ml-2 text-lg text-muted-foreground">
-              Loading admin dashboard...
+              Carregando painel do administrador...
             </span>
           </div>
         </div>
@@ -221,22 +222,26 @@ const AdminDashboardPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container py-8">
-        {/* Header */}
+        {/* Cabeçalho */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-2">
             <Shield className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-heading font-bold">Admin Dashboard</h1>
+            <h1 className="text-3xl font-heading font-bold">
+              Painel do Administrador
+            </h1>
           </div>
           <p className="text-muted-foreground">
-            Manage posts, users, and comments across LingroomTC
+            Gerencie posts, usuários e comentários no LingroomTC
           </p>
         </div>
 
-        {/* Stats Cards */}
+        {/* Cartões de estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="gradient-card shadow-soft">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total de Posts
+              </CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -246,7 +251,9 @@ const AdminDashboardPage: React.FC = () => {
 
           <Card className="gradient-card shadow-soft">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total de Usuários
+              </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -257,7 +264,7 @@ const AdminDashboardPage: React.FC = () => {
           <Card className="gradient-card shadow-soft">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Comments
+                Total de Comentários
               </CardTitle>
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -267,14 +274,16 @@ const AdminDashboardPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Management Tabs */}
+        {/* Abas de gerenciamento */}
         <Card className="gradient-card shadow-medium">
           <CardContent className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="posts">Manage Posts</TabsTrigger>
-                <TabsTrigger value="users">Manage Users</TabsTrigger>
-                <TabsTrigger value="comments">Manage Comments</TabsTrigger>
+                <TabsTrigger value="posts">Gerenciar Posts</TabsTrigger>
+                <TabsTrigger value="users">Gerenciar Usuários</TabsTrigger>
+                <TabsTrigger value="comments">
+                  Gerenciar Comentários
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="posts" className="mt-6">
@@ -282,10 +291,10 @@ const AdminDashboardPage: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Author</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>Título</TableHead>
+                        <TableHead>Autor</TableHead>
+                        <TableHead>Criado</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -295,12 +304,12 @@ const AdminDashboardPage: React.FC = () => {
                             colSpan={4}
                             className="text-center py-8 text-muted-foreground"
                           >
-                            No posts found
+                            Nenhum post encontrado
                           </TableCell>
                         </TableRow>
                       ) : (
                         posts.map((post) => (
-                          <TableRow key={post._id}>
+                          <TableRow key={post.id}>
                             <TableCell className="font-medium max-w-xs truncate">
                               {post.title}
                             </TableCell>
@@ -311,24 +320,24 @@ const AdminDashboardPage: React.FC = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() =>
-                                  router.push(`/edit-post/${post._id}`)
+                                  router.push(`/edit-post/${post.id}`)
                                 }
                               >
                                 <Edit className="h-4 w-4 mr-1" />
-                                Edit
+                                Editar
                               </Button>
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => handleDeletePost(post._id)}
-                                disabled={deleting === post._id}
+                                onClick={() => handleDeletePost(post.id)}
+                                disabled={deleting === post.id}
                               >
-                                {deleting === post._id ? (
+                                {deleting === post.id ? (
                                   <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : (
                                   <>
                                     <Trash2 className="h-4 w-4 mr-1" />
-                                    Delete
+                                    Excluir
                                   </>
                                 )}
                               </Button>
@@ -346,11 +355,11 @@ const AdminDashboardPage: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
+                        <TableHead>Nome</TableHead>
                         <TableHead>Email</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Joined</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>Função</TableHead>
+                        <TableHead>Cadastrado</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -360,12 +369,12 @@ const AdminDashboardPage: React.FC = () => {
                             colSpan={5}
                             className="text-center py-8 text-muted-foreground"
                           >
-                            No users found
+                            Nenhum usuário encontrado
                           </TableCell>
                         </TableRow>
                       ) : (
                         users.map((userData) => (
-                          <TableRow key={userData._id}>
+                          <TableRow key={userData.id}>
                             <TableCell className="font-medium">
                               {userData.name}
                             </TableCell>
@@ -383,19 +392,19 @@ const AdminDashboardPage: React.FC = () => {
                                 : "N/A"}
                             </TableCell>
                             <TableCell className="text-right">
-                              {userData._id !== user.id && (
+                              {userData.id !== user.id && (
                                 <Button
                                   variant="destructive"
                                   size="sm"
-                                  onClick={() => handleDeleteUser(userData._id)}
-                                  disabled={deleting === userData._id}
+                                  onClick={() => handleDeleteUser(userData.id)}
+                                  disabled={deleting === userData.id}
                                 >
-                                  {deleting === userData._id ? (
+                                  {deleting === userData.id ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                   ) : (
                                     <>
                                       <Trash2 className="h-4 w-4 mr-1" />
-                                      Delete
+                                      Excluir
                                     </>
                                   )}
                                 </Button>
@@ -414,11 +423,11 @@ const AdminDashboardPage: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Content</TableHead>
-                        <TableHead>Author</TableHead>
+                        <TableHead>Conteúdo</TableHead>
+                        <TableHead>Autor</TableHead>
                         <TableHead>Post</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>Criado</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -428,17 +437,17 @@ const AdminDashboardPage: React.FC = () => {
                             colSpan={5}
                             className="text-center py-8 text-muted-foreground"
                           >
-                            No comments found
+                            Nenhum comentário encontrado
                           </TableCell>
                         </TableRow>
                       ) : (
                         comments.map((comment) => (
-                          <TableRow key={comment._id}>
+                          <TableRow key={comment.id}>
                             <TableCell className="max-w-xs truncate">
                               {comment.content}
                             </TableCell>
                             <TableCell>{comment.author.name}</TableCell>
-                            <TableCell>Post ID: {comment.post}</TableCell>
+                            <TableCell>Post ID: {comment.postId}</TableCell>
                             <TableCell>
                               {formatDate(comment.createdAt)}
                             </TableCell>
@@ -446,15 +455,15 @@ const AdminDashboardPage: React.FC = () => {
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => handleDeleteComment(comment._id)}
-                                disabled={deleting === comment._id}
+                                onClick={() => handleDeleteComment(comment.id)}
+                                disabled={deleting === comment.id}
                               >
-                                {deleting === comment._id ? (
+                                {deleting === comment.id ? (
                                   <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : (
                                   <>
                                     <Trash2 className="h-4 w-4 mr-1" />
-                                    Delete
+                                    Excluir
                                   </>
                                 )}
                               </Button>

@@ -22,11 +22,7 @@ import {
   type RadialBarProps,
   type ScatterProps,
 } from "recharts";
-import { cn } from "@/lib/utils"; // Supondo que você tenha este utilitário do shadcn
-
-//
-// CONTEXTO E TIPOS DO GRÁFICO (O CORAÇÃO DA CORREÇÃO)
-//
+import { cn } from "@/lib/utils";
 
 type ChartContextProps = {
   config: ChartConfig;
@@ -37,7 +33,7 @@ const ChartContext = createContext<ChartContextProps | null>(null);
 function useChart() {
   const context = useContext(ChartContext);
   if (!context) {
-    throw new Error("useChart must be used within a <ChartContainer>");
+    throw new Error("useChart deve ser usado dentro de um <ChartContainer>");
   }
   return context;
 }
@@ -100,5 +96,4 @@ export type ChartConfig = {
   };
 };
 
-// Exportações Finais
 export { ChartContainer, useChart };

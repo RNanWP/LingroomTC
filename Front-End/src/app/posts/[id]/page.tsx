@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { postsApi, commentsApi } from "@/lib/api";
-import { IPost, IComment } from "@/types";
+import { Post, Comment } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -21,7 +21,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
 
 interface CommentComponentProps {
-  comment: IComment;
+  comment: Comment;
   onReply: (commentId: string, content: string) => Promise<void>;
   canReply: boolean;
   level?: number;
@@ -43,16 +43,16 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
 
     try {
       setSubmitting(true);
-      await onReply(comment._id, replyContent.trim());
+      await onReply(comment.id, replyContent.trim());
       setReplyContent("");
       setShowReplyForm(false);
       toast({
-        title: "Reply posted",
-        description: "Your reply has been posted successfully",
+        title: "Resposta Enviada",
+        description: "Sua resposta foi publicada com sucesso.",
       });
     } catch (error: any) {
       toast({
-        title: "Failed to post reply",
+        title: "Falha ao Enviar Resposta",
         description: error.message,
         variant: "destructive",
       });
@@ -62,7 +62,7 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("pt-BR", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -96,7 +96,7 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
                 className="text-primary hover:text-primary-hover"
               >
                 <Reply className="h-4 w-4 mr-2" />
-                Reply
+                Responder
               </Button>
             </div>
           )}
@@ -104,7 +104,7 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
           {showReplyForm && (
             <form onSubmit={handleReply} className="mt-4 space-y-3">
               <Textarea
-                placeholder="Write your reply..."
+                placeholder="Escreva sua resposta..."
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
                 disabled={submitting}
@@ -119,10 +119,10 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
                   {submitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Posting...
+                      Enviando...
                     </>
                   ) : (
-                    "Post Reply"
+                    "Enviar Resposta"
                   )}
                 </Button>
                 <Button
@@ -132,7 +132,7 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
                   onClick={() => setShowReplyForm(false)}
                   disabled={submitting}
                 >
-                  Cancel
+                  Cancelar
                 </Button>
               </div>
             </form>
@@ -140,7 +140,6 @@ const CommentComponent: React.FC<CommentComponentProps> = ({
         </CardContent>
       </Card>
 
-      {/* Nested replies */}
       {comment.replies && comment.replies.length > 0 && (
         <div className="mt-4 space-y-4">
           {comment.replies.map((reply) => (
@@ -162,7 +161,7 @@ const PostDetailPage: React.FC = () => {
   const params = useParams();
   const id = params.id as string;
   const { user, isAuthenticated } = useAuth();
-  const [post, setPost] = useState<IPost | null>(null);
+  const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -182,13 +181,14 @@ const PostDetailPage: React.FC = () => {
           commentsApi.getPostComments(id),
         ]);
 
-        setPost(postData as IPost);
+        setPost(postData as Post);
         setComments(commentsData as Comment[]);
       } catch (err: any) {
-        setError(err.message || "Failed to load post");
+        setError(err.message || "Falha ao carregar a postagem");
         toast({
-          title: "Error loading post",
-          description: err.message || "Failed to load post",
+          title: "Erro ao carregar a postagem",
+          description:
+            err.message || "Não foi possível carregar o conteúdo desta página.",
           variant: "destructive",
         });
       } finally {
@@ -212,12 +212,12 @@ const PostDetailPage: React.FC = () => {
       setComments([...comments, comment]);
       setNewComment("");
       toast({
-        title: "Comment posted",
-        description: "Your comment has been posted successfully",
+        title: "Comentário Enviado",
+        description: "Seu comentário foi publicado com sucesso.",
       });
     } catch (error: any) {
       toast({
-        title: "Failed to post comment",
+        title: "Falha ao Enviar Comentário",
         description: error.message,
         variant: "destructive",
       });
@@ -228,7 +228,6 @@ const PostDetailPage: React.FC = () => {
 
   const handleReply = async (commentId: string, content: string) => {
     await commentsApi.replyToComment(commentId, content);
-    // Refresh comments to show the new reply
     if (id) {
       const updatedComments = (await commentsApi.getPostComments(
         id
@@ -238,7 +237,7 @@ const PostDetailPage: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("pt-BR", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -254,7 +253,7 @@ const PostDetailPage: React.FC = () => {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <span className="ml-2 text-lg text-muted-foreground">
-              Loading post...
+              Carregando postagem...
             </span>
           </div>
         </div>
@@ -268,7 +267,9 @@ const PostDetailPage: React.FC = () => {
         <div className="container py-8">
           <Alert variant="destructive" className="max-w-2xl mx-auto">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error || "Post not found"}</AlertDescription>
+            <AlertDescription>
+              {error || "Postagem não encontrada."}
+            </AlertDescription>
           </Alert>
         </div>
       </div>
@@ -278,7 +279,6 @@ const PostDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container py-8 max-w-4xl">
-        {/* Post Content */}
         <article className="mb-8">
           <Card className="gradient-card shadow-medium">
             <CardHeader>
@@ -290,7 +290,7 @@ const PostDetailPage: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5" />
                   <Link
-                    href={`/author/${post.author._id}`}
+                    href={`/author/${post.author.id}`}
                     className="font-medium hover:text-primary transition-colors"
                   >
                     {post.author.name}
@@ -313,22 +313,20 @@ const PostDetailPage: React.FC = () => {
           </Card>
         </article>
 
-        {/* Comments Section */}
         <section>
           <div className="flex items-center space-x-2 mb-6">
             <MessageCircle className="h-6 w-6 text-primary" />
             <h2 className="text-2xl font-heading font-semibold">
-              Comments ({comments.length})
+              Comentários ({comments.length})
             </h2>
           </div>
 
-          {/* Add Comment Form */}
           {isAuthenticated && (
             <Card className="gradient-card shadow-soft mb-6">
               <CardContent className="pt-6">
                 <form onSubmit={handleCommentSubmit} className="space-y-4">
                   <Textarea
-                    placeholder="Share your thoughts..."
+                    placeholder="Compartilhe sua opinião..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     disabled={submitting}
@@ -341,10 +339,10 @@ const PostDetailPage: React.FC = () => {
                     {submitting ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Posting...
+                        Enviando...
                       </>
                     ) : (
-                      "Post Comment"
+                      "Enviar Comentário"
                     )}
                   </Button>
                 </form>
@@ -352,16 +350,17 @@ const PostDetailPage: React.FC = () => {
             </Card>
           )}
 
-          {/* Comments List */}
           <div className="space-y-6">
             {comments.length === 0 ? (
               <div className="text-center py-8">
                 <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-lg text-muted-foreground">No comments yet</p>
+                <p className="text-lg text-muted-foreground">
+                  Nenhum comentário ainda.
+                </p>
                 <p className="text-sm text-muted-foreground">
                   {isAuthenticated
-                    ? "Be the first to share your thoughts!"
-                    : "Sign in to join the discussion"}
+                    ? "Seja o primeiro a compartilhar sua opinião!"
+                    : "Faça login para participar da discussão."}
                 </p>
               </div>
             ) : (

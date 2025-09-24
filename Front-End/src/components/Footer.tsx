@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
     <footer className="bg-academic-navy text-white mt-auto">
       <div className="container px-4">
         <div className="py-6">
-          {/* Mobile Layout - Stack vertically */}
+          {/* Layout mobile */}
           <div className="flex flex-col items-center space-y-4 md:hidden">
             <div className="flex items-center space-x-6">
               <a
@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Desktop Layout - Single line */}
+          {/* Layout Desktop */}
           <div className="hidden md:flex items-center justify-center space-x-6">
             <a
               href="https://github.com/RNanWP/LingroomTC"

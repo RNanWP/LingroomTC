@@ -30,6 +30,7 @@ export interface Comment {
     name: string;
   };
   postId: string;
+  post?: string;
   parentId?: string;
   replies?: Comment[];
   parentComment?: string;
