@@ -1,18 +1,49 @@
 import { Request, Response } from "express";
 import * as commentService from "../services/commentService";
+import { IComment, Comment } from "../models/Comment";
 
 // listar comentarios
+// export async function getCommentsByPost(req: Request, res: Response) {
+//   try {
+//     const comments = await commentService.getCommentsByPostService(
+//       req.params.postId
+//     );
+//     res.status(200).json(comments);
+//   } catch (error: any) {
+//     res
+//       .status(500)
+//       .json({ message: "Erro ao buscar comentários", error: error.message });
+//   }
+// }
+
 export async function getCommentsByPost(req: Request, res: Response) {
   try {
-    const comments = await commentService.getCommentsByPostService(
-      req.params.postId
-    );
-    res.status(200).json(comments);
+    const { postId } = req.params;
+    const comments = await getCommentsByPostService(postId);
+    return res.status(200).json(comments);
   } catch (error: any) {
-    res
+    console.error("[getCommentsByPost]", error);
+    return res
       .status(500)
       .json({ message: "Erro ao buscar comentários", error: error.message });
   }
+}
+
+export async function getCommentsByPostService(
+  postId: string
+): Promise<IComment[]> {
+  const comments = await Comment.find({ post: postId, parentComment: null })
+    .populate("author", "name")
+    .populate({
+      path: "replies",
+      populate: {
+        path: "author",
+        select: "name",
+      },
+    })
+    .sort({ createdAt: "desc" });
+
+  return comments;
 }
 
 // Criar comentario
@@ -54,11 +85,20 @@ export async function createReply(req: Request, res: Response) {
         .json({ message: "O conteúdo da resposta é obrigatório" });
     }
 
+    const parentComment = await Comment.findById(commentId);
+    if (!parentComment) {
+      return res
+        .status(404)
+        .json({ message: "Comentário principal não encontrado" });
+    }
+
     const newReply = await commentService.createReplyService({
       content,
       authorId,
       parentCommentId: commentId,
+      postId: parentComment.post.toString(),
     });
+
     res.status(201).json(newReply);
   } catch (error: any) {
     res
