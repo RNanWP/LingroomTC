@@ -91,3 +91,25 @@ export async function deletePost(req: Request, res: Response) {
     res.status(500).json({ message: "Erro ao excluir post" });
   }
 }
+
+// Função para lidar com o upload de imagem
+export async function uploadImage(req: Request, res: Response) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Nenhum arquivo enviado." });
+    }
+
+    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+
+    res.status(201).json({ imageUrl });
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({
+        message: "Erro ao fazer upload da imagem",
+        error: error.message,
+      });
+  }
+}

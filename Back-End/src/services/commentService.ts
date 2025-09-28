@@ -1,6 +1,6 @@
 import { Comment, IComment } from "../models/Comment";
 
-// busca comentários
+// Cria e busca comentários
 export async function getCommentsByPostService(
   postId: string
 ): Promise<IComment[]> {
