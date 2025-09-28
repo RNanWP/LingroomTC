@@ -4,9 +4,29 @@ import { Comment, IComment } from "../models/Comment";
 export async function getCommentsByPostService(
   postId: string
 ): Promise<IComment[]> {
-  return Comment.find({ post: postId, parentComment: null })
+  const populateReplies: any = {
+    path: "replies",
+    populate: [
+      { path: "author", select: "name" },
+      {
+        path: "replies",
+        populate: [
+          { path: "author", select: "name" },
+          {
+            path: "replies",
+            populate: { path: "author", select: "name" },
+          },
+        ],
+      },
+    ],
+  };
+
+  const comments = await Comment.find({ post: postId, parentComment: null })
     .populate("author", "name")
+    .populate(populateReplies)
     .sort({ createdAt: "desc" });
+
+  return comments;
 }
 
 // cria comentario
@@ -28,6 +48,7 @@ export async function createCommentService(data: {
 // cria resposta
 export async function createReplyService(data: {
   content: string;
+  postId: string;
   authorId: string;
   parentCommentId: string;
 }): Promise<IComment> {
@@ -42,7 +63,8 @@ export async function createReplyService(data: {
     author: data.authorId,
     parentComment: data.parentCommentId,
   });
-  return await reply.save();
+  await reply.save();
+  return await reply.populate("author", "name");
 }
 
 // Admin Delete

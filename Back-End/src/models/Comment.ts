@@ -7,6 +7,7 @@ export interface IComment extends Document {
   parentComment?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+  replies?: IComment[];
 }
 
 const CommentSchema = new Schema<IComment>(
@@ -18,5 +19,14 @@ const CommentSchema = new Schema<IComment>(
   },
   { timestamps: true }
 );
+
+CommentSchema.virtual("replies", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "parentComment",
+});
+
+CommentSchema.set("toObject", { virtuals: true });
+CommentSchema.set("toJSON", { virtuals: true });
 
 export const Comment = model<IComment>("Comment", CommentSchema);

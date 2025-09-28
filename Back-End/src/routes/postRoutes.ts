@@ -2,39 +2,51 @@ import { Router } from "express";
 import { authenticate, authorize } from "../middlewares/auth";
 import { asyncHandler } from "../utils/asyncHandler";
 import * as postController from "../controllers/postController";
+import * as commentController from "../controllers/commentController";
 
 const router = Router();
 
-// Rotas publicas
-router.get("/posts", asyncHandler(postController.getAllPosts));
-router.get("/posts/search", asyncHandler(postController.searchPosts));
-router.get("/posts/:id", asyncHandler(postController.getPostById));
+// --- Rotas Públicas ---
+router.get("/", asyncHandler(postController.getAllPosts));
+router.get("/search", asyncHandler(postController.searchPosts));
+router.get("/:id", asyncHandler(postController.getPostById));
 
-// Rotas protegidas
+// --- Rotas de Comentários Relacionadas a Posts ---
+router.get(
+  "/:postId/comments",
+  asyncHandler(commentController.getCommentsByPost)
+);
+
 router.post(
-  "/posts",
+  "/:postId/comments",
+  authenticate,
+  asyncHandler(commentController.createComment)
+);
+
+// --- Rotas Protegidas (Professores e Admins) ---
+router.post(
+  "/",
   authenticate,
   authorize("professor", "administrador"),
   asyncHandler(postController.createPost)
 );
 
 router.put(
-  "/posts/:id",
+  "/:id",
   authenticate,
   authorize("professor", "administrador"),
   asyncHandler(postController.updatePost)
 );
 
 router.delete(
-  "/posts/:id",
+  "/:id",
   authenticate,
   authorize("professor", "administrador"),
   asyncHandler(postController.deletePost)
 );
 
-// Rota ADM
 router.get(
-  "/admin/posts",
+  "/admin",
   authenticate,
   authorize("administrador"),
   asyncHandler(postController.getAdminPosts)
