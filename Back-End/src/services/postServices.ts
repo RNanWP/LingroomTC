@@ -30,7 +30,7 @@ export async function getAllPostsService(): Promise<IPost[]> {
 }
 
 export async function getPostByIdService(id: string): Promise<IPost | null> {
-  return Post.findById(id).exec();
+  return Post.findById(id).populate("author", "name").exec();
 }
 
 export async function createPostService(data: {
