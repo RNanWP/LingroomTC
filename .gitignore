@@ -22,7 +22,9 @@ dist/
 /coverage
 
 # next.js
-/.next/
+.next/
+Front-End/.next/
+
 /out/
 
 # production
@@ -47,3 +49,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+Front-End/.next/
+.next/
