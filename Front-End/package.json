@@ -10,7 +10,9 @@
     "autoprefixer": "^10.4.21",
     "postcss": "^8",
     "tailwindcss-animatecss": "^3.0.5",
-    "typescript": "^5.9.2"
+    "ts-prune": "^0.10.3",
+    "typescript": "^5.9.2",
+    "unimported": "^1.31.0"
   },
   "scripts": {
     "dev": "next dev",
@@ -64,6 +66,7 @@
     "react": "^19.1.1",
     "react-day-picker": "^9.11.0",
     "react-dom": "^19.1.1",
+    "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.63.0",
     "react-resizable-panels": "^3.0.6",
     "recharts": "^3.2.1",
