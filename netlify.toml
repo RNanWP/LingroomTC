@@ -1,0 +1,11 @@
+[build]
+  base = "Front-End"
+  command = "npm ci && npm run build"
+  publish = ".next"
+
+[build.environment]
+  NEXT_PUBLIC_API_BASE_URL = "https://lingroomtc-egxb.onrender.com"
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

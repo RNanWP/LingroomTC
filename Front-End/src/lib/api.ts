@@ -1,5 +1,7 @@
+import { Post, User, Comment, ApiResponse } from "@/types";
+
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
 export interface ApiError {
   message: string;
@@ -96,10 +98,14 @@ export const postsApi = {
   searchPosts: async (query: string) => {
     return apiRequest(`/posts/search?q=${encodeURIComponent(query)}`);
   },
-  createPost: async (title: string, content: string) => {
+  createPost: async (
+    title: string,
+    content: string,
+    imageUrl?: string
+  ): Promise<Post> => {
     return apiRequest("/posts", {
       method: "POST",
-      body: JSON.stringify({ title, content }),
+      body: JSON.stringify({ title, content, imageUrl }),
     });
   },
   updatePost: async (id: string, title: string, content: string) => {
@@ -165,4 +171,27 @@ export const adminApi = {
       method: "DELETE",
     });
   },
+};
+
+// --- API de Upload de Imagens ---
+export const uploadImage = async (
+  file: File
+): Promise<{ imageUrl: string }> => {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`${API_BASE_URL}/posts/upload`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Falha no upload da imagem");
+  }
+
+  return response.json();
 };
