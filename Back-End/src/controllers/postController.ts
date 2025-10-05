@@ -92,7 +92,7 @@ export async function deletePost(req: Request, res: Response) {
   }
 }
 
-// Função para lidar com o upload de imagem
+// Upload de imagem
 export async function uploadImage(req: Request, res: Response) {
   try {
     if (!req.file) {

@@ -108,6 +108,7 @@ export const postsApi = {
       body: JSON.stringify({ title, content, imageUrl }),
     });
   },
+
   updatePost: async (id: string, title: string, content: string) => {
     return apiRequest(`/posts/${id}`, {
       method: "PUT",
