@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save, Loader2, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { postsApi } from "@/lib/api";
+import { postsApi, uploadImage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,16 +11,36 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Post } from "@/types";
+import ImageUpload from "@/components/ImageUpload";
+import Image from "next/image";
 
 const CreatePostPage: React.FC = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleImageSelectedAny = (image: string | File) => {
+    if (typeof image === "string") {
+      setImageUrl(image);
+      setImageFile(null);
+    } else {
+      setImageFile(image);
+      setImageUrl("");
+    }
+  };
+  const clearImageSelection = () => {
+    setImageUrl("");
+    setImageFile(null);
+  };
 
   const { user } = useAuth();
   const router = useRouter();
 
-  // Verifique se o usuário tem permissão para criar postagens
+  // VerifiCAR se o usuário tem permissão para criar postagens
   React.useEffect(() => {
     if (!user || (user.role !== "professor" && user.role !== "administrador")) {
       router.push("/");
@@ -39,11 +59,19 @@ const CreatePostPage: React.FC = () => {
       return;
     }
 
+    setLoading(true);
+    let finalImageUrl = imageUrl;
+
     try {
-      setLoading(true);
+      if (imageFile) {
+        const uploadResponse = await uploadImage(imageFile);
+        finalImageUrl = uploadResponse.imageUrl;
+      }
+
       const newPost = (await postsApi.createPost(
         title.trim(),
-        content.trim()
+        content.trim(),
+        finalImageUrl
       )) as Post;
 
       toast({
@@ -128,7 +156,7 @@ const CreatePostPage: React.FC = () => {
                 </Label>
                 <Textarea
                   id="content"
-                  placeholder="Escreva o conteúdo do seu post aqui. Compartilhe suas ideias, conhecimento e experiências com a comunidade..."
+                  placeholder="Escreva o conteúdo do seu post aqui."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   disabled={loading}
@@ -140,27 +168,86 @@ const CreatePostPage: React.FC = () => {
                 </p>
               </div>
 
-              {(title.trim() || content.trim()) && (
+              {/*  BLOCO DE UPLOAD DE IMAGEM  */}
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Imagem do Post</Label>
+
+                {imageUrl || imageFile ? (
+                  <div className="flex justify">
+                    <div className="relative w-56 h-32 rounded-lg border overflow-hidden">
+                      <Image
+                        src={
+                          imageUrl ||
+                          (imageFile ? URL.createObjectURL(imageFile) : "")
+                        }
+                        alt="Pré-visualização da imagem selecionada"
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2 z-10"
+                        onClick={() => {
+                          setImageUrl("");
+                          setImageFile(null);
+                        }}
+                      >
+                        X
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <ImageUpload
+                    onImageSelect={handleImageSelectedAny}
+                    selectedFile={imageFile}
+                    clearFileSelection={() => setImageFile(null)}
+                    imageUrl={imageUrl}
+                    setImageUrl={setImageUrl}
+                  />
+                )}
+              </div>
+
+              {/* BLOCO DE PRÉ-VISUALIZAÇÃO */}
+              {(title.trim() || content.trim() || imageUrl || imageFile) && (
                 <div className="space-y-2">
                   <Label className="text-base font-medium">
                     Pré-visualização
                   </Label>
-                  <Card className="border-2 border-dashed border-border">
-                    <CardContent className="pt-6">
-                      {title.trim() && (
-                        <h3 className="text-xl font-heading font-semibold mb-3">
-                          {title}
-                        </h3>
-                      )}
-                      {content.trim() && (
-                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                          {content.length > 300
-                            ? content.substring(0, 300) + "..."
-                            : content}
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
+                  <div className="space-y-4 rounded-lg border-2 border-dashed border-border p-4">
+                    {(imageUrl || imageFile) && (
+                      <div className="relative w-full aspect-video rounded-md overflow-hidden">
+                        <Image
+                          src={
+                            imageUrl ||
+                            (imageFile ? URL.createObjectURL(imageFile) : "")
+                          }
+                          alt="Pré-visualização da imagem do post"
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      </div>
+                    )}
+
+                    {/* Pré-visualização do Texto */}
+                    {(title.trim() || content.trim()) && (
+                      <div className="pt-4">
+                        {title.trim() && (
+                          <h3 className="text-xl font-heading font-semibold mb-3">
+                            {title}
+                          </h3>
+                        )}
+                        {content.trim() && (
+                          <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                            {content.length > 300
+                              ? content.substring(0, 300) + "..."
+                              : content}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -205,6 +292,10 @@ const CreatePostPage: React.FC = () => {
               <li>
                 • Use títulos claros e descritivos que resumam seu ponto
                 principal.
+              </li>
+              <li>
+                • Adicione imagens relevantes para ilustrar seus pontos e
+                envolver os leitores
               </li>
               <li>
                 • Estruture seu conteúdo com parágrafos para melhor
