@@ -11,43 +11,21 @@ import path from "path";
 
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:3001",
-  "http://localhost:3000",
-  "https://lingroomtc-egxb.onrender.com",
-  "https://seu-site-no-netlify.netlify.app",
-];
+const uploadsDir = path.resolve(__dirname, "../public/uploads");
 
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      return allowedOrigins.includes(origin)
-        ? cb(null, true)
-        : cb(new Error("Não permitido pelo CORS"));
-    },
-    credentials: true,
-  })
-);
-
-app.options(
-  "*",
-  cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      return allowedOrigins.includes(origin)
-        ? cb(null, true)
-        : cb(new Error("Não permitido pelo CORS"));
-    },
-    credentials: true,
-  })
-);
-
+app.use(cors());
 app.use(express.json());
+app.use(
+  "/uploads",
+  express.static(path.resolve(__dirname, "../public/uploads"))
+);
 
-app.use(express.static(path.join(__dirname, "../public")));
+app.use("/uploads", (req, _res, next) => {
+  console.log("[/uploads] HIT:", req.method, req.path);
+  next();
+});
+
 app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
-
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.static(path.join(__dirname, "../public")));
 app.use("/api/users", userRoutes);

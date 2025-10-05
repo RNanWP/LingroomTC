@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
+import ReactMarkdown from "react-markdown";
 
 interface CommentComponentProps {
   comment: Comment;
@@ -285,7 +286,7 @@ const PostDetailPage: React.FC = () => {
         <article className="mb-8">
           <Card className="gradient-card shadow-medium overflow-hidden">
             {post.imageUrl && (
-              <div className="relative w-full aspect-video mb-8">
+              <div className="relative w-full aspect-video">
                 <Image
                   src={post.imageUrl}
                   alt={`Imagem de destaque para o post ${post.title}`}
@@ -295,6 +296,7 @@ const PostDetailPage: React.FC = () => {
                 />
               </div>
             )}
+
             <CardHeader>
               <h1 className="text-3xl md:text-4xl font-heading font-bold text-balance">
                 {post.title}
@@ -319,9 +321,7 @@ const PostDetailPage: React.FC = () => {
 
             <CardContent>
               <div className="prose prose-lg max-w-none">
-                <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                  {post.content}
-                </p>
+                <ReactMarkdown>{post.content}</ReactMarkdown>
               </div>
             </CardContent>
           </Card>

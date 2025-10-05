@@ -18,12 +18,29 @@ const CreatePostPage: React.FC = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleImageSelectedAny = (image: string | File) => {
+    if (typeof image === "string") {
+      setImageUrl(image);
+      setImageFile(null);
+    } else {
+      setImageFile(image);
+      setImageUrl("");
+    }
+  };
+  const clearImageSelection = () => {
+    setImageUrl("");
+    setImageFile(null);
+  };
+
   const { user } = useAuth();
   const router = useRouter();
 
-  // Verifique se o usuário tem permissão para criar postagens
+  // VerifiCAR se o usuário tem permissão para criar postagens
   React.useEffect(() => {
     if (!user || (user.role !== "professor" && user.role !== "administrador")) {
       router.push("/");
@@ -162,12 +179,13 @@ const CreatePostPage: React.FC = () => {
                 </p>
               </div>
 
+              {/*  BLOCO DE UPLOAD DE IMAGEM  */}
               <div className="space-y-2">
                 <Label className="text-base font-medium">Imagem do Post</Label>
 
                 {imageUrl || imageFile ? (
-                  <div className="relative w-56 h-32 rounded-lg border overflow-hidden">
-                    <div className="relative w-full aspect-video">
+                  <div className="flex justify">
+                    <div className="relative w-56 h-32 rounded-lg border overflow-hidden">
                       <Image
                         src={
                           imageUrl ||
@@ -177,23 +195,23 @@ const CreatePostPage: React.FC = () => {
                         layout="fill"
                         objectFit="cover"
                       />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2 z-10"
+                        onClick={() => {
+                          setImageUrl("");
+                          setImageFile(null);
+                        }}
+                      >
+                        X
+                      </Button>
                     </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-2 right-2 z-10"
-                      onClick={() => {
-                        setImageUrl("");
-                        setImageFile(null);
-                      }}
-                    >
-                      X
-                    </Button>
                   </div>
                 ) : (
                   <ImageUpload
-                    onImageSelect={handleImageSelected}
+                    onImageSelect={handleImageSelectedAny}
                     selectedFile={imageFile}
                     clearFileSelection={() => setImageFile(null)}
                     imageUrl={imageUrl}
@@ -202,13 +220,13 @@ const CreatePostPage: React.FC = () => {
                 )}
               </div>
 
+              {/* BLOCO DE PRÉ-VISUALIZAÇÃO */}
               {(title.trim() || content.trim() || imageUrl || imageFile) && (
                 <div className="space-y-2">
                   <Label className="text-base font-medium">
                     Pré-visualização
                   </Label>
                   <div className="space-y-4 rounded-lg border-2 border-dashed border-border p-4">
-                    {/* Pré-visualização da Imagem */}
                     {(imageUrl || imageFile) && (
                       <div className="relative w-full aspect-video rounded-md overflow-hidden">
                         <Image
@@ -243,25 +261,6 @@ const CreatePostPage: React.FC = () => {
                   </div>
                 </div>
               )}
-
-              {/* <Card className="border-2 border-dashed border-border">
-                    <CardContent className="pt-6">
-                      {title.trim() && (
-                        <h3 className="text-xl font-heading font-semibold mb-3">
-                          {title}
-                        </h3>
-                      )}
-                      {content.trim() && (
-                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                          {content.length > 300
-                            ? content.substring(0, 300) + "..."
-                            : content}
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-              )} */}
 
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <Button

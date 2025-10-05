@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   images: {
     remotePatterns: [
       {
@@ -60,6 +56,14 @@ const nextConfig = {
         hostname: "lingroomtc-egxb.onrender.com",
         pathname: "/uploads/**",
       },
+
+      {
+        protocol: "https",
+        hostname: "external-preview.redd.it",
+        pathname: "/**",
+      },
+      { protocol: "https", hostname: "preview.redd.it", pathname: "/**" },
+      { protocol: "https", hostname: "i.redd.it", pathname: "/**" },
     ],
   },
 };
