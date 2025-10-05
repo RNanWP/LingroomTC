@@ -11,10 +11,42 @@ import path from "path";
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:3001",
+  "http://localhost:3000",
+  "https://lingroomtc-egxb.onrender.com",
+  "https://seu-site-no-netlify.netlify.app",
+];
+
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      return allowedOrigins.includes(origin)
+        ? cb(null, true)
+        : cb(new Error("Não permitido pelo CORS"));
+    },
+    credentials: true,
+  })
+);
+
+app.options(
+  "*",
+  cors({
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      return allowedOrigins.includes(origin)
+        ? cb(null, true)
+        : cb(new Error("Não permitido pelo CORS"));
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "../public")));
+app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.static(path.join(__dirname, "../public")));
