@@ -22,7 +22,9 @@ dist/
 /coverage
 
 # next.js
-/.next/
+.next/
+Front-End/.next/
+
 /out/
 .next/
 Front-End/.next/
