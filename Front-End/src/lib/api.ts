@@ -1,3 +1,5 @@
+import { Post } from "@/types";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api";
 
@@ -96,10 +98,14 @@ export const postsApi = {
   searchPosts: async (query: string) => {
     return apiRequest(`/posts/search?q=${encodeURIComponent(query)}`);
   },
-  createPost: async (title: string, content: string) => {
+  createPost: async (
+    title: string,
+    content: string,
+    imageUrl?: string 
+  ): Promise<Post> => {
     return apiRequest("/posts", {
       method: "POST",
-      body: JSON.stringify({ title, content }),
+      body: JSON.stringify({ title, content, imageUrl }),
     });
   },
   updatePost: async (id: string, title: string, content: string) => {

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Calendar,
   User,
@@ -282,7 +283,19 @@ const PostDetailPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       <div className="container py-8 max-w-4xl">
         <article className="mb-8">
-          <Card className="gradient-card shadow-medium">
+          <Card className="gradient-card shadow-medium overflow-hidden">
+            {post.imageUrl && (
+              <div className="relative w-full aspect-video">
+                <Image
+                  src={post.imageUrl}
+                  alt={`Imagem do post ${post.title}`}
+                  layout="fill"
+                  objectFit="cover"
+                  priority
+                />
+              </div>
+            )}
+
             <CardHeader>
               <h1 className="text-3xl md:text-4xl font-heading font-bold text-balance">
                 {post.title}
