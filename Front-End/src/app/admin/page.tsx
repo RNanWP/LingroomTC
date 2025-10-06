@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Trash2,
   Edit,
@@ -42,7 +43,6 @@ const AdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
   const router = useRouter();
 
-  // Verifica se o usuário tem permissão de administrador
   React.useEffect(() => {
     if (!user || user.role !== "administrador") {
       router.push("/");
@@ -180,7 +180,7 @@ const AdminDashboardPage: React.FC = () => {
         return "destructive";
       case "professor":
         return "default";
-      case "student":
+      case "aluno":
         return "secondary";
       default:
         return "outline";
@@ -222,7 +222,6 @@ const AdminDashboardPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container py-8">
-        {/* Cabeçalho */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-2">
             <Shield className="h-8 w-8 text-primary" />
@@ -235,7 +234,6 @@ const AdminDashboardPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Cartões de estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="gradient-card shadow-soft">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -274,7 +272,6 @@ const AdminDashboardPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Abas de gerenciamento */}
         <Card className="gradient-card shadow-medium">
           <CardContent className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -298,53 +295,39 @@ const AdminDashboardPage: React.FC = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {posts.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={4}
-                            className="text-center py-8 text-muted-foreground"
-                          >
-                            Nenhum post encontrado
+                      {posts.map((post) => (
+                        <TableRow key={post.id}>
+                          <TableCell className="font-medium max-w-xs truncate">
+                            {post.title}
+                          </TableCell>
+                          <TableCell>{post.author.name}</TableCell>
+                          <TableCell>{formatDate(post.createdAt)}</TableCell>
+                          <TableCell className="text-right space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                router.push(`/edit-post/${post.id}`)
+                              }
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Editar
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeletePost(post.id)}
+                              disabled={deleting === post.id}
+                            >
+                              {deleting === post.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
                           </TableCell>
                         </TableRow>
-                      ) : (
-                        posts.map((post) => (
-                          <TableRow key={post.id}>
-                            <TableCell className="font-medium max-w-xs truncate">
-                              {post.title}
-                            </TableCell>
-                            <TableCell>{post.author.name}</TableCell>
-                            <TableCell>{formatDate(post.createdAt)}</TableCell>
-                            <TableCell className="text-right space-x-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                  router.push(`/edit-post/${post.id}`)
-                                }
-                              >
-                                <Edit className="h-4 w-4 mr-1" />
-                                Editar
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleDeletePost(post.id)}
-                                disabled={deleting === post.id}
-                              >
-                                {deleting === post.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <>
-                                    <Trash2 className="h-4 w-4 mr-1" />
-                                    Excluir
-                                  </>
-                                )}
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
@@ -363,56 +346,40 @@ const AdminDashboardPage: React.FC = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {users.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={5}
-                            className="text-center py-8 text-muted-foreground"
-                          >
-                            Nenhum usuário encontrado
+                      {users.map((userData) => (
+                        <TableRow key={userData.id}>
+                          <TableCell className="font-medium">
+                            {userData.name}
+                          </TableCell>
+                          <TableCell>{userData.email}</TableCell>
+                          <TableCell>
+                            <Badge variant={getRoleBadgeVariant(userData.role)}>
+                              {userData.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {userData.createdAt
+                              ? formatDate(userData.createdAt)
+                              : "N/A"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {userData.id !== user.id && (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteUser(userData.id)}
+                                disabled={deleting === userData.id}
+                              >
+                                {deleting === userData.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )}
                           </TableCell>
                         </TableRow>
-                      ) : (
-                        users.map((userData) => (
-                          <TableRow key={userData.id}>
-                            <TableCell className="font-medium">
-                              {userData.name}
-                            </TableCell>
-                            <TableCell>{userData.email}</TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={getRoleBadgeVariant(userData.role)}
-                              >
-                                {userData.role}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {userData.createdAt
-                                ? formatDate(userData.createdAt)
-                                : "N/A"}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {userData.id !== user.id && (
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() => handleDeleteUser(userData.id)}
-                                  disabled={deleting === userData.id}
-                                >
-                                  {deleting === userData.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    <>
-                                      <Trash2 className="h-4 w-4 mr-1" />
-                                      Excluir
-                                    </>
-                                  )}
-                                </Button>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
@@ -431,46 +398,41 @@ const AdminDashboardPage: React.FC = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {comments.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={5}
-                            className="text-center py-8 text-muted-foreground"
-                          >
-                            Nenhum comentário encontrado
+                      {comments.map((comment) => (
+                        <TableRow key={comment.id}>
+                          <TableCell className="max-w-xs truncate">
+                            {comment.content}
+                          </TableCell>
+                          <TableCell>{comment.author.name}</TableCell>
+                          <TableCell className="max-w-[150px] truncate">
+                            {comment.post ? (
+                              <Link
+                                href={`/posts/${comment.post.id}`}
+                                className="text-primary hover:underline"
+                              >
+                                {comment.post.title}
+                              </Link>
+                            ) : (
+                              "Post não disponível"
+                            )}
+                          </TableCell>
+                          <TableCell>{formatDate(comment.createdAt)}</TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteComment(comment.id)}
+                              disabled={deleting === comment.id}
+                            >
+                              {deleting === comment.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
                           </TableCell>
                         </TableRow>
-                      ) : (
-                        comments.map((comment) => (
-                          <TableRow key={comment.id}>
-                            <TableCell className="max-w-xs truncate">
-                              {comment.content}
-                            </TableCell>
-                            <TableCell>{comment.author.name}</TableCell>
-                            <TableCell>Post ID: {comment.postId}</TableCell>
-                            <TableCell>
-                              {formatDate(comment.createdAt)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleDeleteComment(comment.id)}
-                                disabled={deleting === comment.id}
-                              >
-                                {deleting === comment.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <>
-                                    <Trash2 className="h-4 w-4 mr-1" />
-                                    Excluir
-                                  </>
-                                )}
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
+                      ))}
                     </TableBody>
                   </Table>
                 </div>

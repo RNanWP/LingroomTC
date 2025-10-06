@@ -2,11 +2,9 @@ import { Comment, IComment } from "../models/Comment";
 
 async function deleteRepliesRecursive(commentId: string) {
   const replies = await Comment.find({ parentComment: commentId });
-
   for (const reply of replies) {
     await deleteRepliesRecursive(reply.id);
   }
-
   await Comment.deleteMany({ parentComment: commentId });
 }
 
@@ -14,6 +12,7 @@ async function deleteRepliesRecursive(commentId: string) {
 export async function getCommentsByPostService(
   postId: string
 ): Promise<IComment[]> {
+
   const populateReplies: any = {
     path: "replies",
     populate: [
@@ -85,12 +84,12 @@ export async function deleteCommentService(
   return Comment.findByIdAndDelete(id);
 }
 
-// Admin: Retorna todos os comentários
 export async function getAllCommentsService(): Promise<IComment[]> {
   const comments = await Comment.find()
     .populate("author", "name")
+    .populate("post", "title")
     .sort({ createdAt: "desc" })
     .exec();
 
-  return comments.filter((comment: IComment) => comment.author);
+  return comments.filter((comment: IComment) => comment.author && comment.post);
 }
