@@ -92,7 +92,7 @@ export async function deletePost(req: Request, res: Response) {
   }
 }
 
-// Função para lidar com o upload de imagem
+// Upload de imagem
 export async function uploadImage(req: Request, res: Response) {
   try {
     if (!req.file) {
@@ -105,11 +105,9 @@ export async function uploadImage(req: Request, res: Response) {
 
     res.status(201).json({ imageUrl });
   } catch (error: any) {
-    res
-      .status(500)
-      .json({
-        message: "Erro ao fazer upload da imagem",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Erro ao fazer upload da imagem",
+      error: error.message,
+    });
   }
 }
