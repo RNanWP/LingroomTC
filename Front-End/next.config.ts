@@ -2,10 +2,10 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "localhost",
-      },
+      // {
+      //   protocol: "http",
+      //   hostname: "localhost",
+      // },
 
       {
         protocol: "https",
@@ -39,23 +39,23 @@ const nextConfig = {
         hostname: "png.pngtree.com",
       },
 
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "3000",
-        pathname: "/uploads/**",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "3001",
-        pathname: "/uploads/**",
-      },
-      {
-        protocol: "https",
-        hostname: "lingroomtc-egxb.onrender.com",
-        pathname: "/uploads/**",
-      },
+      // {
+      //   protocol: "http",
+      //   hostname: "localhost",
+      //   port: "3000",
+      //   pathname: "/uploads/**",
+      // },
+      // {
+      //   protocol: "http",
+      //   hostname: "localhost",
+      //   port: "3001",
+      //   pathname: "/uploads/**",
+      // },
+      // {
+      //   protocol: "https",
+      //   hostname: "lingroomtc-egxb.onrender.com",
+      //   pathname: "/uploads/**",
+      // },
 
       {
         protocol: "https",
