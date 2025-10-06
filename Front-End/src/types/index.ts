@@ -1,5 +1,3 @@
-// src/types/index.ts
-
 export interface User {
   id: string;
   name: string;
@@ -53,18 +51,4 @@ export interface PaginatedResponse<T> {
 export interface PaginationParams {
   page?: number;
   limit?: number;
-}
-
-export interface UploadedImage {
-  id: string;
-  url: string;
-  file?: File;
-  preview?: string;
-}
-
-export interface ImageUploadProps {
-  images: UploadedImage[];
-  onImagesChange: (images: UploadedImage[]) => void;
-  maxImages?: number;
-  maxSizeMB?: number;
 }
