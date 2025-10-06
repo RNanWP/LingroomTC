@@ -3,9 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Calendar, Image } from "lucide-react";
+import { User, Calendar, ImageIcon } from "lucide-react";
 import { Post } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 
 interface PostCardProps {
   post: Post;
@@ -23,13 +24,10 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   };
 
   const getContentPreview = (content: string, maxLength: number = 120) => {
-    if (content.length <= maxLength) {
-      return content;
-    }
+    if (content.length <= maxLength) return content;
     return content.substring(0, maxLength).trim() + "...";
   };
 
-  // Função para navegar para o post
   const handleCardClick = () => {
     router.push(`/posts/${post.id}`);
   };
@@ -39,10 +37,20 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       className="group hover:shadow-medium transition-all duration-300 hover:-translate-y-1 gradient-card overflow-hidden h-full flex flex-col cursor-pointer"
       onClick={handleCardClick}
     >
-      {/* Placeholder Image */}
-      <div className="aspect-video bg-gradient-hero flex items-center justify-center border-b border-border/40 flex-shrink-0">
-        <Image className="h-12 w-12 text-primary/60" />
-      </div>
+      {post.imageUrl ? (
+        <div className="relative w-full aspect-video border-b border-border/40">
+          <Image
+            src={post.imageUrl}
+            alt={`Imagem do post ${post.title}`}
+            layout="fill"
+            objectFit="cover"
+          />
+        </div>
+      ) : (
+        <div className="aspect-video bg-gradient-hero flex items-center justify-center border-b border-border/40 flex-shrink-0">
+          <ImageIcon className="h-12 w-12 text-primary/60" />
+        </div>
+      )}
 
       <CardHeader className="pb-3 flex-shrink-0">
         <CardTitle className="text-lg md:text-xl font-heading hover:text-primary transition-colors line-clamp-2">
