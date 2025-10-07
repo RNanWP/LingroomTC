@@ -8,7 +8,8 @@ services:
       - MONGO_URI=mongodb://mongo:27017/LingroomTC
       - PORT=3000
       - JWT_SECRET=seuSegredoAqui
-    # volumes:
+    volumes:
+      - uploads-data:/usr/src/app/public/uploads
     #   - .:/usr/src/app
     #   - /usr/src/app/node_modules
     depends_on:
@@ -22,3 +23,5 @@ services:
       - mongo-data:/data/db
 volumes:
   mongo-data:
+
+  uploads-data:

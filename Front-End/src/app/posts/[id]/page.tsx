@@ -286,7 +286,7 @@ const PostDetailPage: React.FC = () => {
         <article className="mb-8">
           <Card className="gradient-card shadow-medium overflow-hidden">
             {post.imageUrl && (
-              <div className="relative w-full aspect-video">
+              <div className="relative w-full aspect-video mb-8">
                 <Image
                   src={post.imageUrl}
                   alt={`Imagem do post ${post.title}`}

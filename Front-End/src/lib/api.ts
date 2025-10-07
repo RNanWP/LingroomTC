@@ -51,7 +51,7 @@ export const apiRequest = async <T>(
         ...options.headers,
       },
       body: options.body,
-      credentials: "include",
+      credentials: "include", // importante se usa cookie/sessão
       mode: "cors",
     });
     if (!response.ok) {
@@ -181,4 +181,27 @@ export const adminApi = {
       method: "DELETE",
     });
   },
+};
+
+// --- API de Upload de Imagens ---
+export const uploadImage = async (
+  file: File
+): Promise<{ imageUrl: string }> => {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`${API_BASE_URL}/posts/upload`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Falha no upload da imagem");
+  }
+
+  return response.json();
 };
