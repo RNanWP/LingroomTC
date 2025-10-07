@@ -1,7 +1,7 @@
 import express from "express";
 import cors, { CorsOptions } from "cors";
 import path from "path";
-import "dotenv/config"; // ou o dotenv.config(...) acima
+import "dotenv/config";
 
 import postRoutes from "./routes/postRoutes";
 import userRoutes from "./routes/userRoutes";
@@ -14,8 +14,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3001",
-  // Adicione aqui o URL do seu front-end da Vercel quando o tiver
-  // Ex: 'https://seu-projeto-frontend.vercel.app'
+  // 'https://projeto-frontend.vercel.app'
 ];
 
 const corsOptions: cors.CorsOptions = {
