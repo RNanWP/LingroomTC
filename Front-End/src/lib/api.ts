@@ -110,7 +110,7 @@ export const postsApi = {
   createPost: async (
     title: string,
     content: string,
-    imageUrl?: string
+    imageUrl?: string 
   ): Promise<Post> => {
     return apiRequest("/posts", {
       method: "POST",
