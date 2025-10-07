@@ -39,3 +39,28 @@ router.post(
 );
 
 export default router;
+
+// const router = Router();
+
+// // mostra todos os comentários
+// router.get(
+//   "/posts/:postId/comments",
+//   asyncHandler(commentController.getCommentsByPost)
+// );
+
+// // Alunos cria comentário
+// router.post(
+//   "/posts/:postId/comments",
+//   authenticate,
+//   asyncHandler(commentController.createComment)
+// );
+
+// // Proff e ADM respondem comentário
+// router.post(
+//   "/comments/:commentId/reply",
+//   authenticate,
+//   authorize("professor", "administrador"),
+//   asyncHandler(commentController.createReply)
+// );
+
+// export default router;

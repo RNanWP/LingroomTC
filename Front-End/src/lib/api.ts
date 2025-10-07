@@ -1,7 +1,7 @@
-import { Post, User, Comment, ApiResponse } from "@/types";
+import { Post } from "@/types";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api";
 
 export interface ApiError {
   message: string;
@@ -43,8 +43,17 @@ export const apiRequest = async <T>(
   };
 
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: options.method ?? "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...options.headers,
+      },
+      body: options.body,
+      credentials: "include", // importante se usa cookie/sessão
+      mode: "cors",
+    });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw {
@@ -101,13 +110,14 @@ export const postsApi = {
   createPost: async (
     title: string,
     content: string,
-    imageUrl?: string
+    imageUrl?: string 
   ): Promise<Post> => {
     return apiRequest("/posts", {
       method: "POST",
       body: JSON.stringify({ title, content, imageUrl }),
     });
   },
+
   updatePost: async (id: string, title: string, content: string) => {
     return apiRequest(`/posts/${id}`, {
       method: "PUT",

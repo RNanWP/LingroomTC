@@ -295,6 +295,7 @@ const PostDetailPage: React.FC = () => {
                 />
               </div>
             )}
+
             <CardHeader>
               <h1 className="text-3xl md:text-4xl font-heading font-bold text-balance">
                 {post.title}
@@ -319,9 +320,7 @@ const PostDetailPage: React.FC = () => {
 
             <CardContent>
               <div className="prose prose-lg max-w-none">
-                <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                  {post.content}
-                </p>
+                <ReactMarkdown>{post.content}</ReactMarkdown>
               </div>
             </CardContent>
           </Card>
