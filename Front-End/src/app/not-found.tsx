@@ -1,5 +1,3 @@
-// src/app/not-found.tsx - Código corrigido
-
 import Link from "next/link";
 
 export default function NotFound() {

@@ -2,7 +2,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-const uploadDir = path.resolve(__dirname, "../public/uploads");
+const uploadDir = path.resolve(__dirname, "../../public/uploads");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -27,7 +27,7 @@ const fileFilter = (req: any, file: any, cb: any) => {
   } else {
     cb(
       new Error(
-        "Tipo de arquivo não suportado! Apenas imagens são permitidas."
+        "Tipo de ficheiro não suportado! Apenas imagens são permitidas."
       ),
       false
     );

@@ -10,14 +10,17 @@ const router = Router();
 // --- Rotas Públicas ---
 router.get("/", asyncHandler(postController.getAllPosts));
 router.get("/search", asyncHandler(postController.searchPosts));
+router.get("/:id", asyncHandler(postController.getPostById));
+
+// --- Rota de Upload de Imagem ---
 router.post(
   "/upload",
   authenticate,
   upload.single("image"),
   asyncHandler(postController.uploadImage)
 );
-router.get("/:id", asyncHandler(postController.getPostById));
 
+// --- Rotas de Comentários aninhadas em Posts ---
 router.get(
   "/:postId/comments",
   asyncHandler(commentController.getCommentsByPost)
