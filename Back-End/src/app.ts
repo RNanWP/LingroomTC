@@ -7,46 +7,40 @@ import postRoutes from "./routes/postRoutes";
 import userRoutes from "./routes/userRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import adminRoutes from "./routes/adminRoutes";
-
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./config/swaggerDef.json";
 
 const app = express();
 
-// --- CORS manual, ANTES de tudo ---
-const allowedOrigins = ["http://localhost:3001"]; // front local
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-    res.header("Vary", "Origin");
-  }
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,PATCH,DELETE,OPTIONS"
-  );
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+const allowedOrigins = [
+  "http://localhost:3001",
+  // Adicione aqui o URL do seu front-end da Vercel quando o tiver
+  // Ex: 'https://seu-projeto-frontend.vercel.app'
+];
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204); // responde preflight corretamente
-  }
-  next();
-});
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg =
+        "A política de CORS para este site não permite acesso a partir da origem especificada.";
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  optionsSuccessStatus: 204,
+};
 
-// se você ainda quiser servir arquivos estáticos:
-// app.use(express.static(path.join(__dirname, "../public")));
+app.use(cors(corsOptions));
 
+// Middlewares
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(express.static(path.join(__dirname, "../public")));
 
-// logs (ok deixar)
-app.use((req, _res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
-});
-
-// suas rotas
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Rotas da API
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);

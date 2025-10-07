@@ -20,7 +20,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "react-markdown;
 
 interface CommentComponentProps {
   comment: Comment;
@@ -289,7 +289,7 @@ const PostDetailPage: React.FC = () => {
               <div className="relative w-full aspect-video">
                 <Image
                   src={post.imageUrl}
-                  alt={`Imagem de destaque para o post ${post.title}`}
+                  alt={`Imagem do post ${post.title}`}
                   layout="fill"
                   objectFit="cover"
                   priority
