@@ -51,7 +51,7 @@ export const apiRequest = async <T>(
         ...options.headers,
       },
       body: options.body,
-      credentials: "include", // importante se usa cookie/sessão
+      credentials: "include",
       mode: "cors",
     });
     if (!response.ok) {

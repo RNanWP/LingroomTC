@@ -20,7 +20,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
-import ReactMarkdown from "react-markdown;
+import ReactMarkdown from "react-markdown";
 
 interface CommentComponentProps {
   comment: Comment;
