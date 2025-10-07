@@ -26,6 +26,9 @@ dist/
 Front-End/.next/
 
 /out/
+.next/
+Front-End/.next/
+
 
 # production
 /build
@@ -49,5 +52,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-Front-End/.next/
-.next/
+
