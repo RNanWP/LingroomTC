@@ -1,55 +1,67 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://localhost:3000/api/:path*",
-      },
-      {
-        source: "/uploads/:path*",
-        destination: "http://localhost:3000/uploads/:path*",
-      },
-    ];
-  },
-
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
+    unoptimized: true,
     remotePatterns: [
+      { protocol: "http", hostname: "localhost" },
       {
-        protocol: "https",
-        hostname: "**",
+        protocol: "http",
+        hostname: "localhost",
+        port: "3000",
+        pathname: "/uploads/**",
       },
       {
         protocol: "http",
-        hostname: "**",
+        hostname: "localhost",
+        port: "3001",
+        pathname: "/uploads/**",
       },
-
       {
         protocol: "https",
         hostname: "lingroomtc-egxb.onrender.com",
         pathname: "/uploads/**",
       },
 
-      { protocol: "https", hostname: "www.google.com" },
+      // --- GOOGLE IMAGES ---
       { protocol: "https", hostname: "encrypted-tbn0.gstatic.com" },
-      { protocol: "https", hostname: "i0.wp.com" },
-      { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "i.imgur.com" },
-      { protocol: "https", hostname: "picjumbo.com" },
-      { protocol: "https", hostname: "img.freepik.com" },
-      { protocol: "https", hostname: "outro-site.com" },
-      { protocol: "https", hostname: "png.pngtree.com" },
+      { protocol: "https", hostname: "encrypted-tbn1.gstatic.com" },
+      { protocol: "https", hostname: "encrypted-tbn2.gstatic.com" },
+      { protocol: "https", hostname: "encrypted-tbn3.gstatic.com" },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        pathname: "/**",
+      },
+
+      { protocol: "https", hostname: "i0.wp.com", pathname: "/**" },
+      { protocol: "https", hostname: "i1.wp.com", pathname: "/**" },
+      { protocol: "https", hostname: "i2.wp.com", pathname: "/**" },
+
+      // --- UNSPLASH / IMGUR / POSTIMG ---
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      { protocol: "https", hostname: "i.imgur.com", pathname: "/**" },
+      { protocol: "https", hostname: "i.postimg.cc", pathname: "/**" },
+
       {
         protocol: "https",
         hostname: "external-preview.redd.it",
         pathname: "/**",
       },
-      { protocol: "https", hostname: "preview.redd. it", pathname: "/**" },
+      { protocol: "https", hostname: "preview.redd.it", pathname: "/**" },
       { protocol: "https", hostname: "i.redd.it", pathname: "/**" },
-      { protocol: "https", hostname: "wallpapers.com" },
-      { protocol: "https", hostname: "e1.pxfuel.com" },
-      { protocol: "https", hostname: "i.pinimg.com" },
+
+      // --- BANCOS POPULARES DE IMAGEM ---
+      { protocol: "https", hostname: "img.freepik.com", pathname: "/**" },
+      { protocol: "https", hostname: "png.pngtree.com", pathname: "/**" },
+      { protocol: "https", hostname: "images.pexels.com", pathname: "/**" },
+      { protocol: "https", hostname: "cdn.pixabay.com", pathname: "/**" },
+      { protocol: "https", hostname: "live.staticflickr.com", pathname: "/**" },
+
+      { protocol: "https", hostname: "picjumbo.com", pathname: "/**" },
+      { protocol: "https", hostname: "static.vecteezy.com" },
+      { protocol: "https", hostname: "wallpapers.com", pathname: "/**" },
+
+      { protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" },
     ],
   },
 };

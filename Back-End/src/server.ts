@@ -1,11 +1,8 @@
-import dotenv from "dotenv";
-dotenv.config();
 import mongoose from "mongoose";
 import { app } from "./app";
 import { MONGO_URI, PORT } from "./config";
-import path from "path";
-
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+// import dotenv from "dotenv";
+// dotenv.config();
 
 if (process.env.NODE_ENV !== "test") {
   mongoose

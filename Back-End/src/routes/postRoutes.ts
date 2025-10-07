@@ -3,6 +3,7 @@ import { authenticate, authorize } from "../middlewares/auth";
 import { asyncHandler } from "../utils/asyncHandler";
 import * as postController from "../controllers/postController";
 import * as commentController from "../controllers/commentController";
+import upload from "../middlewares/upload";
 
 const router = Router();
 
@@ -11,6 +12,15 @@ router.get("/", asyncHandler(postController.getAllPosts));
 router.get("/search", asyncHandler(postController.searchPosts));
 router.get("/:id", asyncHandler(postController.getPostById));
 
+// --- Rota de Upload de Imagem ---
+router.post(
+  "/upload",
+  authenticate,
+  upload.single("image"),
+  asyncHandler(postController.uploadImage)
+);
+
+// --- Rotas de Comentários aninhadas em Posts ---
 router.get(
   "/:postId/comments",
   asyncHandler(commentController.getCommentsByPost)

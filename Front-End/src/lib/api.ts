@@ -182,3 +182,26 @@ export const adminApi = {
     });
   },
 };
+
+// --- API de Upload de Imagens ---
+export const uploadImage = async (
+  file: File
+): Promise<{ imageUrl: string }> => {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`${API_BASE_URL}/posts/upload`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Falha no upload da imagem");
+  }
+
+  return response.json();
+};

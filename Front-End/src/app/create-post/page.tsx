@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save, Loader2, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { postsApi } from "@/lib/api";
+import { postsApi, uploadImage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,23 +18,28 @@ const CreatePostPage: React.FC = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-
   const { user } = useAuth();
   const router = useRouter();
 
+  // Verifique se o usuário tem permissão para criar postagens
   React.useEffect(() => {
     if (!user || (user.role !== "professor" && user.role !== "administrador")) {
       router.push("/");
     }
   }, [user, router]);
 
-  const handleImageSelected = (url: string) => {
-    setImageUrl(url);
-    toast({
-      title: "Imagem Adicionada",
-      description: "A URL da imagem foi vinculada ao post.",
-    });
+  const handleImageSelected = (imageSource: string | File) => {
+    if (typeof imageSource === "string") {
+      setImageUrl(imageSource);
+      setImageFile(null);
+      toast({ title: "URL da imagem adicionada." });
+    } else {
+      setImageFile(imageSource);
+      setImageUrl("");
+      toast({ title: "Arquivo de imagem selecionado." });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,12 +55,18 @@ const CreatePostPage: React.FC = () => {
     }
 
     setLoading(true);
+    let finalImageUrl = imageUrl;
 
     try {
+      if (imageFile) {
+        const uploadResponse = await uploadImage(imageFile);
+        finalImageUrl = uploadResponse.imageUrl;
+      }
+
       const newPost = (await postsApi.createPost(
         title.trim(),
         content.trim(),
-        imageUrl.trim()
+        finalImageUrl
       )) as Post;
 
       toast({
@@ -78,7 +89,6 @@ const CreatePostPage: React.FC = () => {
       setLoading(false);
     }
   };
-
   const handleCancel = () => {
     if (title.trim() || content.trim()) {
       if (
@@ -112,6 +122,7 @@ const CreatePostPage: React.FC = () => {
               </div>
             </div>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
@@ -128,69 +139,93 @@ const CreatePostPage: React.FC = () => {
                   className="text-lg h-12"
                   maxLength={200}
                 />
+                <p className="text-xs text-muted-foreground">
+                  {title.length}/200 caracteres
+                </p>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="content" className="text-base font-medium">
                   Conteúdo do Post
                 </Label>
                 <Textarea
                   id="content"
-                  placeholder="Escreva o conteúdo do seu post aqui..."
+                  placeholder="Escreva o conteúdo do seu post aqui."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   disabled={loading}
                   className="min-h-[400px] text-base leading-relaxed"
                   maxLength={10000}
                 />
+                <p className="text-xs text-muted-foreground">
+                  {content.length}/10.000 caracteres
+                </p>
               </div>
 
               <div className="space-y-2">
-                <Label>Imagem do Post</Label>
-                {imageUrl ? (
-                  <div className="relative w-56 h-32">
-                    <Image
-                      src={imageUrl}
-                      alt="Pré-visualização da imagem do post"
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-md border"
-                    />
+                <Label className="text-base font-medium">
+                  Imagem do Post
+                </Label>
+
+                {imageUrl || imageFile ? (
+                  <div className="relative w-56 h-32 rounded-lg border overflow-hidden">
+                    <div className="relative w-full aspect-video">
+                      <Image
+                        src={
+                          imageUrl ||
+                          (imageFile ? URL.createObjectURL(imageFile) : "")
+                        }
+                        alt="Pré-visualização da imagem selecionada"
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                    </div>
                     <Button
                       type="button"
                       variant="destructive"
                       size="sm"
-                      className="absolute top-2 right-2"
-                      onClick={() => setImageUrl("")}
+                      className="absolute top-2 right-2 z-10"
+                      onClick={() => {
+                        setImageUrl("");
+                        setImageFile(null);
+                      }}
                     >
-                      Remover
+                      X
                     </Button>
                   </div>
                 ) : (
                   <ImageUpload
                     onImageSelect={handleImageSelected}
+                    selectedFile={imageFile}
+                    clearFileSelection={() => setImageFile(null)}
                     imageUrl={imageUrl}
                     setImageUrl={setImageUrl}
                   />
                 )}
               </div>
 
-              {/* BLOCO DE PRÉ-VISUALIZAÇÃO */}
-              {(title.trim() || content.trim() || imageUrl) && (
+              {(title.trim() || content.trim() || imageUrl || imageFile) && (
                 <div className="space-y-2">
                   <Label className="text-base font-medium">
                     Pré-visualização
                   </Label>
                   <div className="space-y-4 rounded-lg border-2 border-dashed border-border p-4">
-                    {imageUrl && (
+                    {/* Pré-visualização da Imagem */}
+                    {(imageUrl || imageFile) && (
                       <div className="relative w-full aspect-video rounded-md overflow-hidden">
                         <Image
-                          src={imageUrl}
+                          src={
+                            imageUrl ||
+                            (imageFile ? URL.createObjectURL(imageFile) : "")
+                          }
                           alt="Pré-visualização da imagem do post"
                           layout="fill"
                           objectFit="cover"
                         />
                       </div>
                     )}
+
+                    {/* Pré-visualização do Texto */}
                     {(title.trim() || content.trim()) && (
                       <div className="pt-4">
                         {title.trim() && (
@@ -211,6 +246,25 @@ const CreatePostPage: React.FC = () => {
                 </div>
               )}
 
+              {/* <Card className="border-2 border-dashed border-border">
+                    <CardContent className="pt-6">
+                      {title.trim() && (
+                        <h3 className="text-xl font-heading font-semibold mb-3">
+                          {title}
+                        </h3>
+                      )}
+                      {content.trim() && (
+                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                          {content.length > 300
+                            ? content.substring(0, 300) + "..."
+                            : content}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              )} */}
+
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <Button
                   type="button"
@@ -220,6 +274,7 @@ const CreatePostPage: React.FC = () => {
                 >
                   Cancelar
                 </Button>
+
                 <Button
                   type="submit"
                   disabled={loading || !title.trim() || !content.trim()}
@@ -241,21 +296,34 @@ const CreatePostPage: React.FC = () => {
             </form>
           </CardContent>
         </Card>
+
         <Card className="mt-6 gradient-card shadow-soft">
           <CardContent className="pt-6">
             <h3 className="font-heading font-semibold mb-3">
               Dicas de Escrita
             </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Use títulos claros e descritivos.</li>
-              <li>• Estruture seu conteúdo com parágrafos.</li>
+              <li>
+                • Use títulos claros e descritivos que resumam seu ponto
+                principal.
+              </li>
               <li>
                 • Adicione imagens relevantes para ilustrar seus pontos e
                 envolver os leitores
               </li>
-              <li>• Inclua exemplos do mundo real.</li>
+              <li>
+                • Estruture seu conteúdo com parágrafos para melhor
+                legibilidade.
+              </li>
+              <li>
+                • Inclua exemplos e aplicações do mundo real sempre que
+                possível.
+              </li>
               <li>• Revise seu conteúdo antes de publicar.</li>
-              <li>• Interaja com os comentários.</li>
+              <li>
+                • Interaja com os comentários para fomentar a discussão da
+                comunidade.
+              </li>
             </ul>
           </CardContent>
         </Card>
