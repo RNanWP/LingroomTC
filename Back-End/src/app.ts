@@ -1,45 +1,49 @@
 import express from "express";
-import cors, { CorsOptions } from "cors";
+import cors from "cors";
 import path from "path";
-import "dotenv/config";
 
 import postRoutes from "./routes/postRoutes";
 import userRoutes from "./routes/userRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import adminRoutes from "./routes/adminRoutes";
+
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./config/swaggerDef.json";
 
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:3001",
-  // 'https://projeto-frontend.vercel.app'
-];
+const allowedOrigins = ["http://localhost:3001"];
+// 'https://projeto-frontend.vercel.app';
 
 const corsOptions: cors.CorsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg =
-        "A política de CORS para este site não permite acesso a partir da origem especificada.";
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
+  origin(origin, cb) {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error("Not allowed by CORS"));
   },
   credentials: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   optionsSuccessStatus: 204,
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
+app.use((req, res, next) => {
+  res.header("Vary", "Origin");
+  next();
+});
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
-// Middlewares
 app.use(express.json());
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use(express.static(path.join(__dirname, "../public")));
 
-// Rotas da API
+app.use((req, _res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
+
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
