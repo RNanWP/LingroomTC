@@ -2,7 +2,6 @@
 const nextConfig = {
   images: {
     unoptimized: true,
-    eslint: { ignoreDuringBuilds: true },
     remotePatterns: [
       { protocol: "http", hostname: "localhost" },
       {
