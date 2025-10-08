@@ -85,7 +85,7 @@ const LoginPage: React.FC = () => {
               Faça login em sua conta para continuar aprendendo
             </CardDescription>
             <CardDescription className="text-xs text-muted-foreground mt-2 p-2 bg-muted/50 rounded">
-              <strong>Teste:</strong> admin.insomnia@teste.com (senha: 123)
+              <strong>Teste:</strong> prof.insomnia@teste.com (senha: 123)
             </CardDescription>
           </CardHeader>
 
