@@ -14,7 +14,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3001",
-  "lingroom-tc.vercel.app",
+  "https://lingroom-tc.vercel.app/",
 ];
 
 const corsOptions: cors.CorsOptions = {
